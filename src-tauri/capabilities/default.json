@@ -1,0 +1,29 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Least-privilege capability for the AlgoJava main window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
+    "opener:default",
+    "opener:allow-open-path",
+    "store:default",
+    "sql:default",
+    "sql:allow-execute",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "os:default",
+    "log:default",
+    "updater:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "global-shortcut:allow-is-registered"
+  ]
+}
