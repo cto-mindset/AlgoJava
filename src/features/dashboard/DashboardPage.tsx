@@ -69,20 +69,27 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1280px] space-y-5 p-6">
+    <div className="mx-auto max-w-[1320px] space-y-5 p-6">
       {/* Hero Banner */}
-      <section className="algo-surface algo-hero-backdrop relative overflow-hidden px-7 py-6">
+      <section className="algo-surface algo-hero-backdrop relative overflow-hidden px-7 py-7">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight leading-tight text-[var(--text-primary)]">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-border)]/70 bg-[var(--accent-soft)] px-3 py-1 text-xs font-medium text-[var(--accent-light)]">
+              <IconCode size={13} />
+              <span>Offline Java Practice Studio</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-[38px] font-bold tracking-[-0.025em] leading-[1.12] text-[var(--text-primary)]">
               Welcome back,
               <br />
               <span className="algo-accent-text">{userName}!</span>
             </h1>
-            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-              Sharpen your Java skills with practice problems
-              <br className="hidden sm:inline" /> and become a better developer.
+
+            <p className="text-[15px] leading-relaxed text-[var(--text-secondary)] max-w-md">
+              Sharpen your Java skills with focused algorithm challenges and track
+              every solution locally.
             </p>
+
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button
                 variant="primary"
@@ -103,7 +110,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="hidden md:flex justify-end pr-2">
+          <div className="hidden lg:flex shrink-0 justify-end pr-1">
             <DashboardHeroArtwork />
           </div>
         </div>
@@ -111,11 +118,12 @@ export function DashboardPage() {
 
       {/* Main Content Grid: Categories (Left) + Stats & Quote (Right) */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-        {/* Problem Categories (7 cols) */}
-        <section className="algo-surface p-5 lg:col-span-7 flex flex-col gap-4">
+        {/* Problem Categories (8 cols on xl, 7 on lg) */}
+        <section className="algo-surface p-5 lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
           <SectionHeader
             icon={<IconLayersSubtract size={18} />}
             title="Problem Categories"
+            subtitle="Jump directly into a core Java topic"
             action={
               <Link
                 to="/problems"
@@ -127,35 +135,47 @@ export function DashboardPage() {
             }
           />
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
             {featuredCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => navigate(`/problems?category=${cat.id}`)}
-                className="group flex flex-col justify-between rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] p-3.5 text-left transition-all duration-150 hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] cursor-pointer"
+                className="group flex flex-col justify-between rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4 text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)] cursor-pointer"
               >
                 <div>
-                  <div className="mb-2.5 flex items-center justify-between">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-input)] border border-[var(--border-subtle)]">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span
+                      className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] border"
+                      style={{
+                        backgroundColor: `${cat.accentColor}1a`,
+                        borderColor: `${cat.accentColor}38`,
+                      }}
+                    >
                       <CategoryIcon icon={cat.icon} color={cat.accentColor} size={18} />
                     </span>
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] transition-all duration-150 group-hover:translate-x-0.5 group-hover:border-transparent group-hover:bg-[var(--accent-primary)] group-hover:text-white">
+                      <IconArrowRight size={13} />
+                    </span>
                   </div>
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                  <h3 className="text-[14.5px] font-semibold text-[var(--text-primary)]">
                     {cat.name}
                   </h3>
-                  <p className="mt-0.5 text-xs text-[var(--text-secondary)] line-clamp-1">
+                  <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)] line-clamp-1">
                     {cat.description}
                   </p>
                 </div>
 
-                <div className="mt-3.5 space-y-2">
+                <div className="mt-4 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-[var(--text-secondary)]">
+                    <span className="algo-tabular font-medium text-[var(--text-secondary)]">
                       {cat.solvedProblems} / {cat.totalProblems}
                     </span>
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-input)] text-[var(--text-secondary)] transition-colors group-hover:bg-[var(--accent-primary)] group-hover:text-white">
-                      <IconArrowRight size={13} />
+                    <span className="algo-tabular text-[11px] text-[var(--text-muted)]">
+                      {cat.totalProblems > 0
+                        ? Math.round((cat.solvedProblems / cat.totalProblems) * 100)
+                        : 0}
+                      %
                     </span>
                   </div>
                   <ProgressBar
@@ -170,44 +190,44 @@ export function DashboardPage() {
           </div>
         </section>
 
-        {/* Right Column: Your Stats + Quote (5 cols) */}
-        <div className="flex flex-col gap-4 lg:col-span-5">
-          <section className="algo-surface p-5 flex-1">
+        {/* Right Column: Your Stats + Quote (4 cols on xl, 5 on lg) */}
+        <div className="flex flex-col gap-4 lg:col-span-5 xl:col-span-4">
+          <section className="algo-surface p-5 flex-1 flex flex-col justify-between">
             <SectionHeader
               icon={<IconTrophy size={18} className="text-[var(--status-warning)]" />}
               title="Your Stats"
             />
 
-            <div className="mt-5 flex flex-col items-center gap-6 sm:flex-row">
-              <CircularProgress percentage={data.overallPercentage} />
+            <div className="my-4 flex flex-col items-center gap-5 sm:flex-row lg:flex-col xl:flex-row">
+              <CircularProgress percentage={data.overallPercentage} size={114} />
 
-              <div className="flex-1 w-full space-y-3.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                    <IconCheck size={15} className="text-[var(--status-success)]" />
-                    <span>Solved Problems</span>
+              <div className="flex-1 w-full divide-y divide-[var(--border-subtle)]">
+                <div className="flex items-center justify-between py-2 first:pt-0">
+                  <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                    <IconCheck size={15} className="text-[var(--status-success)] shrink-0" />
+                    <span>Solved</span>
                   </div>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
+                  <span className="algo-tabular text-sm font-bold text-[var(--text-primary)]">
                     {data.solvedProblems}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                    <IconPlayerPlay size={15} className="text-[var(--accent-light)]" />
-                    <span>Total Attempts</span>
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                    <IconPlayerPlay size={15} className="text-[var(--accent-light)] shrink-0" />
+                    <span>Attempts</span>
                   </div>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
+                  <span className="algo-tabular text-sm font-bold text-[var(--text-primary)]">
                     {data.totalAttempts}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                    <IconFlame size={15} className="text-orange-400" />
-                    <span>Current Streak</span>
+                <div className="flex items-center justify-between py-2 last:pb-0">
+                  <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                    <IconFlame size={15} className="text-[var(--status-warning)] shrink-0" />
+                    <span>Streak</span>
                   </div>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
+                  <span className="algo-tabular text-sm font-bold text-[var(--text-primary)]">
                     {data.currentStreakDays}{" "}
                     {data.currentStreakDays === 1 ? "day" : "days"}
                   </span>
@@ -216,8 +236,10 @@ export function DashboardPage() {
             </div>
           </section>
 
-          <section className="algo-surface px-5 py-4 flex items-center gap-3.5">
-            <IconQuote size={26} className="shrink-0 text-[var(--accent-light)]" />
+          <section className="algo-surface border-l-2 border-l-[var(--accent-primary)] px-5 py-4 flex items-center gap-3.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent-light)]">
+              <IconQuote size={18} />
+            </span>
             <div>
               <p className="text-sm italic text-[var(--text-primary)]">
                 "Practice makes perfect."
@@ -249,6 +271,16 @@ export function DashboardPage() {
             icon={<IconCode size={22} />}
             title="No activity yet"
             description="Start solving problems to see your activity here."
+            action={
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<IconPlayerPlay size={14} />}
+                onClick={handleStartPracticing}
+              >
+                Solve First Problem
+              </Button>
+            }
           />
         ) : (
           <ul className="mt-4 divide-y divide-[var(--border-subtle)]">
@@ -257,7 +289,7 @@ export function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => navigate(`/problems/${item.problemSlug}`)}
-                  className="flex w-full items-center justify-between gap-4 py-2.5 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left cursor-pointer"
+                  className="flex w-full items-center justify-between gap-4 py-2.5 px-2.5 rounded-[var(--radius-sm)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
@@ -273,7 +305,7 @@ export function DashboardPage() {
                         <IconPlayerPlay size={13} />
                       )}
                     </span>
-                    <span className="truncate text-sm text-[var(--text-primary)]">
+                    <span className="truncate text-[13.5px] text-[var(--text-primary)]">
                       <span className="font-semibold">
                         {item.status === "passed" ? "Solved:" : "Attempted:"}
                       </span>{" "}
@@ -283,7 +315,7 @@ export function DashboardPage() {
                       </span>
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0 text-xs text-[var(--text-muted)]">
+                  <div className="algo-tabular flex items-center gap-3 shrink-0 text-xs text-[var(--text-muted)]">
                     <span>
                       {item.passedCount}/{item.totalCount} tests
                     </span>
