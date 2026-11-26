@@ -16,6 +16,14 @@ export default defineConfig(() => ({
   },
 
   clearScreen: false,
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, "index.html"),
+        splash: path.resolve(import.meta.dirname, "splash.html"),
+      },
+    },
+  },
   server: {
     port: 1420,
     strictPort: true,

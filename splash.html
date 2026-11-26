@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgoJava</title>
+    <style>
+      :root {
+        --splash-bg: #090912;
+        --splash-border: rgba(148, 163, 184, 0.16);
+        --splash-accent-light: #a78bfa;
+        --splash-text: #f1f5f9;
+        --splash-muted: #9aa6be;
+        --splash-dim: #6b7894;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--splash-bg);
+        color: var(--splash-text);
+        font-family: "Outfit Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        user-select: none;
+      }
+
+      .splash-shell {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        height: 100%;
+        padding: 22px 26px 20px;
+        background: radial-gradient(
+            ellipse 80% 90% at 88% 12%,
+            rgba(124, 58, 237, 0.22) 0%,
+            rgba(49, 46, 129, 0.12) 45%,
+            transparent 75%
+          ),
+          var(--splash-bg);
+        border: 1px solid rgba(139, 92, 246, 0.34);
+        overflow: hidden;
+      }
+
+      .splash-grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(rgba(167, 139, 250, 0.16) 1px, transparent 1px);
+        background-size: 20px 20px;
+        mask-image: radial-gradient(ellipse 85% 90% at 70% 45%, #000 25%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 85% 90% at 70% 45%, #000 25%, transparent 100%);
+      }
+
+      .splash-orb {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(44px);
+        pointer-events: none;
+      }
+
+      .splash-orb-primary {
+        top: -70px;
+        right: -50px;
+        width: 210px;
+        height: 210px;
+        background: rgba(124, 58, 237, 0.28);
+      }
+
+      .splash-orb-secondary {
+        bottom: -80px;
+        left: -40px;
+        width: 180px;
+        height: 180px;
+        background: rgba(56, 189, 248, 0.12);
+      }
+
+      .splash-top,
+      .splash-center,
+      .splash-footer {
+        position: relative;
+        z-index: 2;
+      }
+
+      .splash-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .splash-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        background: rgba(124, 58, 237, 0.16);
+        border: 1px solid rgba(139, 92, 246, 0.4);
+        color: var(--splash-accent-light);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .splash-pill-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+        background: #22c55e;
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+      }
+
+      .splash-badge {
+        padding: 4px 10px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--splash-border);
+        color: var(--splash-muted);
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .splash-center {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .splash-brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .splash-logo-wrap {
+        position: relative;
+        width: 58px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .splash-logo-ring {
+        position: absolute;
+        inset: -4px;
+        border-radius: 16px;
+        border: 1px solid rgba(167, 139, 250, 0.45);
+        animation: splash-pulse 2.2s ease-in-out infinite;
+      }
+
+      .splash-logo {
+        position: relative;
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+          0 10px 26px -6px rgba(124, 58, 237, 0.55);
+      }
+
+      .splash-wordmark {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        color: var(--splash-text);
+      }
+
+      .splash-wordmark-accent {
+        background: linear-gradient(95deg, #c4b5fd 0%, #818cf8 55%, #60a5fa 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .splash-subtitle {
+        margin-top: 5px;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--splash-muted);
+      }
+
+      .splash-code-chip {
+        width: 152px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: rgba(14, 14, 27, 0.9);
+        border: 1px solid var(--splash-border);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
+          0 12px 28px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+      }
+
+      .splash-code-header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 9px;
+        background: rgba(25, 25, 48, 0.9);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .splash-code-header .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+      }
+
+      .splash-code-header .dot-r {
+        background: rgba(251, 113, 133, 0.85);
+      }
+      .splash-code-header .dot-y {
+        background: rgba(251, 191, 36, 0.85);
+      }
+      .splash-code-header .dot-g {
+        background: rgba(52, 211, 153, 0.85);
+      }
+
+      .splash-code-file {
+        margin-left: auto;
+        font-family: "JetBrains Mono Variable", "Consolas", monospace;
+        font-size: 9.5px;
+        color: var(--splash-muted);
+      }
+
+      .splash-code-body {
+        padding: 8px 10px;
+        font-family: "JetBrains Mono Variable", "Consolas", monospace;
+        font-size: 10px;
+        line-height: 1.5;
+        color: #cbd5e1;
+      }
+
+      .splash-code-body .kw {
+        color: #c084fc;
+      }
+      .splash-code-body .tp {
+        color: #fbbf24;
+      }
+      .splash-code-body .fn {
+        color: #60a5fa;
+      }
+      .splash-code-body .str {
+        color: #4ade80;
+      }
+
+      .splash-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .splash-telemetry {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+      }
+
+      .splash-status {
+        color: var(--splash-muted);
+        font-weight: 500;
+      }
+
+      .splash-percent {
+        font-variant-numeric: tabular-nums;
+        font-family: "JetBrains Mono Variable", "Consolas", monospace;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--splash-accent-light);
+      }
+
+      .splash-track {
+        position: relative;
+        width: 100%;
+        height: 4px;
+        border-radius: 9999px;
+        background: rgba(148, 163, 184, 0.14);
+        overflow: hidden;
+      }
+
+      .splash-bar {
+        height: 100%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 60%, #60a5fa 100%);
+        transition: width 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 0 0 12px rgba(124, 58, 237, 0.55);
+      }
+
+      .splash-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 10.5px;
+        color: var(--splash-dim);
+      }
+
+      @keyframes splash-pulse {
+        0%,
+        100% {
+          opacity: 0.45;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.9;
+          transform: scale(1.06);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .splash-logo-ring {
+          animation: none;
+        }
+        .splash-bar {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="splash-shell" data-tauri-drag-region>
+      <div class="splash-grid" aria-hidden="true"></div>
+      <div class="splash-orb splash-orb-primary" aria-hidden="true"></div>
+      <div class="splash-orb splash-orb-secondary" aria-hidden="true"></div>
+
+      <!-- Top Studio Bar -->
+      <header class="splash-top" data-tauri-drag-region>
+        <div class="splash-pill">
+          <span class="splash-pill-dot"></span>
+          <span>Offline Java Studio</span>
+        </div>
+        <div class="splash-badge">100% Free &amp; Offline</div>
+      </header>
+
+      <!-- Center Hero Composition -->
+      <main class="splash-center" data-tauri-drag-region>
+        <div class="splash-brand">
+          <div class="splash-logo-wrap">
+            <div class="splash-logo-ring" aria-hidden="true"></div>
+            <div class="splash-logo">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 8l-4 4l4 4" />
+                <path d="M17 8l4 4l-4 4" />
+                <path d="M14 4l-4 16" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="splash-title-group">
+            <h1 class="splash-wordmark">
+              Algo<span class="splash-wordmark-accent">Java</span>
+            </h1>
+            <p class="splash-subtitle">
+              Offline Edition of CodingBat · Native Rust Core
+            </p>
+          </div>
+        </div>
+
+        <aside class="splash-code-chip" aria-hidden="true">
+          <div class="splash-code-header">
+            <span class="dot dot-r"></span>
+            <span class="dot dot-y"></span>
+            <span class="dot dot-g"></span>
+            <span class="splash-code-file">Solution.java</span>
+          </div>
+          <pre class="splash-code-body"><span class="kw">class</span> <span class="tp">Solution</span> {
+  <span class="kw">int</span> <span class="fn">boot</span>() {
+    <span class="kw">return</span> <span class="str">1</span>;
+  }
+}</pre>
+        </aside>
+      </main>
+
+      <!-- Bottom Telemetry Dock -->
+      <footer class="splash-footer" data-tauri-drag-region>
+        <div class="splash-telemetry">
+          <span id="splash-status" class="splash-status">
+            Initializing AlgoJava workspace...
+          </span>
+          <span id="splash-percent" class="splash-percent">12%</span>
+        </div>
+        <div class="splash-track">
+          <div id="splash-bar" class="splash-bar" style="width: 12%"></div>
+        </div>
+        <div class="splash-meta">
+          <span>v0.1.0</span>
+          <span>by Dilshod Fayzullayev (Dylan)</span>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/splash/main.ts"></script>
+  </body>
+</html>
