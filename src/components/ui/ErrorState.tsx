@@ -20,7 +20,9 @@ export function ErrorState({
       <h3 className="text-base font-semibold text-[var(--text-primary)]">
         {title}
       </h3>
-      <p className="mt-1.5 text-sm text-[var(--text-secondary)]">{message}</p>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+        {message}
+      </p>
       {onRetry && (
         <div className="mt-4">
           <Button

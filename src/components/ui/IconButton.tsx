@@ -23,12 +23,12 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   ) => {
     const variantCls =
       variant === "secondary"
-        ? "bg-[var(--bg-surface-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]"
+        ? "bg-[var(--bg-surface-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] hover:border-[var(--border-strong)]"
         : variant === "danger"
         ? "text-[var(--text-secondary)] hover:text-white hover:bg-[var(--status-danger)]"
         : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]";
 
-    const sizeCls = size === "sm" ? "h-7 w-7" : "h-8.5 w-8.5";
+    const sizeCls = size === "sm" ? "h-8 w-8" : "h-9 w-9";
 
     return (
       <button
@@ -37,7 +37,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         aria-label={label}
         title={label}
         className={cn(
-          "inline-flex items-center justify-center rounded-[var(--radius-sm)] transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)] disabled:opacity-45 disabled:cursor-not-allowed",
+          "inline-flex items-center justify-center rounded-[var(--radius-sm)] transition-all duration-150 active:scale-[0.96] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)] disabled:opacity-45 disabled:cursor-not-allowed disabled:active:scale-100",
           variantCls,
           sizeCls,
           className

@@ -17,7 +17,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
       <h3 className="text-sm font-semibold text-[var(--text-primary)]">
         {title}
       </h3>
-      <p className="mt-1 max-w-sm text-xs text-[var(--text-secondary)]">
+      <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-[var(--text-secondary)]">
         {description}
       </p>
       {action && <div className="mt-4">{action}</div>}

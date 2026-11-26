@@ -15,6 +15,7 @@ export * from "./ProgressBar";
 export * from "./SectionHeader";
 export * from "./SegmentedControl";
 export * from "./Select";
+export * from "./SettingsSection";
 export * from "./Switch";
 export * from "./Toast";
 export * from "./Tooltip";

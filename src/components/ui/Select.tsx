@@ -13,6 +13,7 @@ export interface SelectProps<T extends string | number = string> {
   ariaLabel?: string;
   className?: string;
   disabled?: boolean;
+  selectSize?: "sm" | "md";
 }
 
 export function Select<T extends string | number = string>({
@@ -22,7 +23,10 @@ export function Select<T extends string | number = string>({
   ariaLabel,
   className,
   disabled,
+  selectSize = "md",
 }: SelectProps<T>) {
+  const heightCls = selectSize === "sm" ? "h-8 text-xs" : "h-9 text-[13px]";
+
   return (
     <div className={cn("relative inline-flex items-center", className)}>
       <select
@@ -36,7 +40,10 @@ export function Select<T extends string | number = string>({
             onChange(match.value);
           }
         }}
-        className="w-full appearance-none bg-[var(--bg-input)] border border-[var(--border-default)] hover:border-[var(--border-strong)] focus:border-[var(--accent-border)] rounded-[var(--radius-sm)] px-3 pr-8 py-1.5 text-sm text-[var(--text-primary)] focus:outline-none cursor-pointer disabled:opacity-50"
+        className={cn(
+          "w-full appearance-none bg-[var(--bg-input)] border border-[var(--border-default)] hover:border-[var(--border-strong)] focus:border-[var(--accent-border)] focus:ring-2 focus:ring-[var(--accent-soft)] rounded-[var(--radius-sm)] px-3 pr-8 text-[var(--text-primary)] focus:outline-none transition-colors cursor-pointer disabled:opacity-50",
+          heightCls
+        )}
       >
         {options.map((opt) => (
           <option

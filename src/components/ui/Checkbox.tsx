@@ -28,10 +28,10 @@ export function Checkbox({
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-          "flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border transition-colors",
+          "flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)]",
           checked
             ? "bg-[var(--accent-primary)] border-[var(--accent-border)] text-white"
-            : "bg-[var(--bg-input)] border-[var(--border-strong)]"
+            : "bg-[var(--bg-input)] border-[var(--border-strong)] hover:border-[var(--accent-border)]"
         )}
       >
         {checked && <IconCheck size={12} stroke={3} />}

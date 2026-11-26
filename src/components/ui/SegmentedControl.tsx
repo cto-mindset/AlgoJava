@@ -23,7 +23,7 @@ export function SegmentedControl<T extends string | number>({
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--bg-input)] border border-[var(--border-default)] p-0.5 gap-0.5",
+        "inline-flex h-9 items-center rounded-[var(--radius-sm)] bg-[var(--bg-input)] border border-[var(--border-default)] p-1 gap-0.5",
         className
       )}
     >
@@ -33,12 +33,13 @@ export function SegmentedControl<T extends string | number>({
           <button
             key={String(opt.value)}
             type="button"
+            aria-pressed={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "inline-flex items-center justify-center gap-1.5 rounded-[6px] px-3 py-1 text-xs font-medium transition-all cursor-pointer",
+              "inline-flex h-full items-center justify-center gap-1.5 rounded-[6px] px-3 text-xs font-medium transition-all duration-150 cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)]",
               active
-                ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-xs"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]/60"
             )}
           >
             {opt.icon}

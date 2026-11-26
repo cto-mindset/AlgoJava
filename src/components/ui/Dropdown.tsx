@@ -26,8 +26,15 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
         setOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     window.addEventListener("mousedown", handleOutside);
-    return () => window.removeEventListener("mousedown", handleOutside);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open]);
 
   return (
@@ -36,7 +43,7 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
       {open && (
         <div
           className={cn(
-            "absolute z-40 mt-1.5 min-w-44 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface-elevated)] p-1 shadow-[var(--shadow-md)]",
+            "algo-animate-dropdown absolute z-40 mt-1.5 min-w-44 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface-elevated)] p-1.5 shadow-[var(--surface-highlight),var(--shadow-md)]",
             align === "right" ? "right-0" : "left-0"
           )}
         >
@@ -49,7 +56,7 @@ export function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
                 item.onSelect();
               }}
               className={cn(
-                "flex w-full items-center gap-2 rounded-[var(--radius-xs)] px-2.5 py-1.5 text-left text-xs font-medium transition-colors cursor-pointer",
+                "flex w-full items-center gap-2 rounded-[var(--radius-xs)] px-2.5 py-2 text-left text-[13px] font-medium transition-colors cursor-pointer",
                 item.danger
                   ? "text-[var(--status-danger)] hover:bg-[var(--status-danger-soft)]"
                   : "text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]"

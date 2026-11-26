@@ -5,14 +5,28 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   leftIcon?: React.ReactNode;
   rightElement?: React.ReactNode;
   containerClassName?: string;
+  inputSize?: "sm" | "md";
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ leftIcon, rightElement, className, containerClassName, ...props }, ref) => {
+  (
+    {
+      leftIcon,
+      rightElement,
+      className,
+      containerClassName,
+      inputSize = "md",
+      ...props
+    },
+    ref
+  ) => {
+    const heightCls = inputSize === "sm" ? "h-8" : "h-9";
+
     return (
       <div
         className={cn(
-          "relative flex items-center bg-[var(--bg-input)] border border-[var(--border-default)] rounded-[var(--radius-sm)] focus-within:border-[var(--accent-border)] focus-within:ring-1 focus-within:ring-[var(--accent-soft)] transition-colors",
+          "relative flex items-center bg-[var(--bg-input)] border border-[var(--border-default)] hover:border-[var(--border-strong)] rounded-[var(--radius-sm)] focus-within:border-[var(--accent-border)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-colors",
+          heightCls,
           containerClassName
         )}
       >
@@ -24,7 +38,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={cn(
-            "w-full bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none disabled:opacity-60",
+            "h-full w-full bg-transparent px-3 text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none disabled:opacity-60",
             leftIcon ? "pl-2" : "",
             rightElement ? "pr-2" : "",
             className

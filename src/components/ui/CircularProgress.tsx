@@ -7,7 +7,7 @@ export interface CircularProgressProps {
 
 export function CircularProgress({
   percentage,
-  size = 128,
+  size = 124,
   strokeWidth = 10,
   label = "Overall Progress",
 }: CircularProgressProps) {
@@ -40,14 +40,14 @@ export function CircularProgress({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 400ms ease" }}
+          style={{ transition: "stroke-dashoffset 450ms cubic-bezier(0.2, 0.8, 0.2, 1)" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
-        <span className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+        <span className="algo-tabular text-2xl font-bold tracking-tight text-[var(--text-primary)]">
           {clamped}%
         </span>
-        <span className="text-[11px] leading-tight text-[var(--text-secondary)]">
+        <span className="mt-0.5 text-[11px] leading-tight text-[var(--text-secondary)]">
           {label}
         </span>
       </div>

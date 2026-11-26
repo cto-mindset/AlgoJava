@@ -30,7 +30,7 @@ export function PageHeader({
           </div>
         )}
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+          <h1 className="text-[26px] leading-tight font-bold tracking-[-0.02em] text-[var(--text-primary)]">
             {title}
           </h1>
           {subtitle && (
@@ -40,7 +40,7 @@ export function PageHeader({
           )}
         </div>
       </div>
-      {actions && <div className="flex items-center gap-2.5">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2.5">{actions}</div>}
     </div>
   );
 }

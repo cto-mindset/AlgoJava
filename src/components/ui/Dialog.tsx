@@ -35,7 +35,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4"
+      className="algo-animate-fade fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -43,7 +43,7 @@ export function Dialog({
     >
       <div
         className={cn(
-          "w-full rounded-[var(--radius-lg)] bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-[var(--shadow-lg)] overflow-hidden",
+          "algo-animate-scale w-full rounded-[var(--radius-lg)] bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-[var(--surface-highlight),var(--shadow-lg)] overflow-hidden",
           maxWidthClass
         )}
         onClick={(e) => e.stopPropagation()}
@@ -54,7 +54,7 @@ export function Dialog({
               {title}
             </h2>
             {description && (
-              <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
+              <p className="mt-0.5 text-[13px] text-[var(--text-secondary)]">
                 {description}
               </p>
             )}
@@ -69,7 +69,7 @@ export function Dialog({
         </div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-2.5 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] px-5 py-3">
+          <div className="flex items-center justify-end gap-2.5 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-5 py-3">
             {footer}
           </div>
         )}

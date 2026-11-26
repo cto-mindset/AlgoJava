@@ -25,11 +25,11 @@ export function SectionHeader({
           </span>
         )}
         <div className="min-w-0">
-          <h2 className="text-[15px] font-semibold text-[var(--text-primary)] truncate">
+          <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--text-primary)] truncate">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs text-[var(--text-secondary)] truncate">
+            <p className="mt-0.5 text-[13px] text-[var(--text-secondary)] truncate">
               {subtitle}
             </p>
           )}
