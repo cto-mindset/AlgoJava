@@ -5,6 +5,10 @@ import { ThemeProvider } from "@/app/providers/ThemeProvider";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TitleBar } from "@/components/layout/TitleBar";
 import {
+  finishSplashScreen,
+  updateSplashStatus,
+} from "@/lib/tauri/windowClient";
+import {
   Badge,
   Button,
   ConfirmDialog,
@@ -175,5 +179,12 @@ describe("Design System UI Components", () => {
     await waitFor(() => {
       expect(useSettingsStore.getState().settings.theme).toBe("dark");
     });
+  });
+
+  it("handles splash screen IPC helpers safely outside Tauri runtime", async () => {
+    await expect(
+      updateSplashStatus("Loading...", 50)
+    ).resolves.toBeUndefined();
+    await expect(finishSplashScreen()).resolves.toBeUndefined();
   });
 });
