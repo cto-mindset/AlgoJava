@@ -30,6 +30,9 @@
     rgba(49, 46, 129, 0.12) 45%,
     transparent 76%
   );
+  --hero-grid-dot: rgba(167, 139, 250, 0.16);
+  --hero-orb-primary: rgba(124, 58, 237, 0.24);
+  --hero-orb-secondary: rgba(56, 189, 248, 0.12);
   --sidebar-wave: radial-gradient(
     circle at 18% 94%,
     rgba(109, 40, 217, 0.26) 0%,
@@ -80,6 +83,9 @@
     rgba(99, 102, 241, 0.04) 45%,
     transparent 76%
   );
+  --hero-grid-dot: rgba(109, 40, 217, 0.13);
+  --hero-orb-primary: rgba(124, 58, 237, 0.11);
+  --hero-orb-secondary: rgba(37, 99, 235, 0.07);
   --sidebar-wave: radial-gradient(
     circle at 18% 94%,
     rgba(124, 58, 237, 0.07) 0%,

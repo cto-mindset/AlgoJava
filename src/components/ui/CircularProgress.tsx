@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export interface CircularProgressProps {
   percentage: number;
   size?: number;
@@ -11,6 +13,7 @@ export function CircularProgress({
   strokeWidth = 10,
   label = "Overall Progress",
 }: CircularProgressProps) {
+  const gradientId = useId();
   const clamped = Math.max(0, Math.min(100, Math.round(percentage)));
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -22,6 +25,20 @@ export function CircularProgress({
       style={{ width: size, height: size }}
     >
       <svg width={size} height={size} className="-rotate-90">
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--accent-primary)" />
+            <stop offset="100%" stopColor="var(--accent-light)" />
+          </linearGradient>
+        </defs>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius + strokeWidth / 2 - 1}
+          fill="transparent"
+          stroke="var(--border-subtle)"
+          strokeWidth={1}
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -35,12 +52,14 @@ export function CircularProgress({
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="var(--accent-primary)"
+          stroke={`url(#${gradientId})`}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 450ms cubic-bezier(0.2, 0.8, 0.2, 1)" }}
+          style={{
+            transition: "stroke-dashoffset 450ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
