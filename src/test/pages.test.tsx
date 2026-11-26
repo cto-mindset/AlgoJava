@@ -114,6 +114,11 @@ describe("AlgoJava Application Pages", () => {
     expect(screen.getByText("2 / 10")).toBeInTheDocument();
     expect(screen.getByText("4%")).toBeInTheDocument();
     expect(screen.getByText("No activity yet")).toBeInTheDocument();
+    expect(screen.getByText("Sum Of Two Numbers")).toBeInTheDocument();
+
+    const tipButton = screen.getByRole("button", { name: "Next Java tip" });
+    fireEvent.click(tipButton);
+    expect(tipButton).toBeInTheDocument();
   });
 
   it("renders ProblemsPage and passes search & difficulty filters to repository", async () => {
@@ -156,6 +161,7 @@ describe("AlgoJava Application Pages", () => {
     );
 
     expect(await screen.findByText("Sum of Two Numbers")).toBeInTheDocument();
+    expect(screen.getByText("12 ms")).toBeInTheDocument();
 
     const search = screen.getByLabelText("Search problems");
     fireEvent.change(search, { target: { value: "Sum" } });
@@ -165,9 +171,17 @@ describe("AlgoJava Application Pages", () => {
         expect.objectContaining({ search: "Sum" })
       );
     });
+
+    fireEvent.click(screen.getByRole("button", { name: "Easy" }));
+
+    await waitFor(() => {
+      expect(mockGetProblems).toHaveBeenLastCalledWith(
+        expect.objectContaining({ difficulty: "Easy", search: "Sum" })
+      );
+    });
   });
 
-  it("requires confirmation in SettingsPage before clearing temporary cache", async () => {
+  it("switches settings tabs and requires confirmation in SettingsPage before clearing temporary cache", async () => {
     render(
       <MemoryRouter initialEntries={["/settings"]}>
         <Routes>
@@ -176,8 +190,12 @@ describe("AlgoJava Application Pages", () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText("Data & Storage")).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Settings sections" })).toBeInTheDocument();
+    const tablist = screen.getByRole("tablist", { name: "Settings sections" });
+    expect(tablist).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Appearance" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
 
     const uiFontSelect = screen.getByLabelText("UI Font Family") as HTMLSelectElement;
     expect(uiFontSelect.value).toBe("outfit");
@@ -185,6 +203,9 @@ describe("AlgoJava Application Pages", () => {
     await waitFor(() => {
       expect(useSettingsStore.getState().settings.fontFamily).toBe("jost");
     });
+
+    fireEvent.click(screen.getByRole("tab", { name: "Storage" }));
+    expect(await screen.findByText("Data & Storage")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Clear Cache" }));
     expect(
@@ -203,7 +224,23 @@ describe("AlgoJava Application Pages", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
-  it("renders AboutPage security notice and open-source libraries", async () => {
+  it("deep-links directly to Settings runtime tab via query param", async () => {
+    render(
+      <MemoryRouter initialEntries={["/settings?tab=runtime"]}>
+        <Routes>
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("tab", { name: "Runtime" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(await screen.findByText("Java Runtime")).toBeInTheDocument();
+  });
+
+  it("renders AboutPage story, creator details, privacy policy, and security notice", async () => {
     render(
       <MemoryRouter initialEntries={["/about"]}>
         <Routes>
@@ -215,7 +252,12 @@ describe("AlgoJava Application Pages", () => {
     expect(
       await screen.findByText(/Local Execution Security/i)
     ).toBeInTheDocument();
-    expect(screen.getByText("CodeMirror 6")).toBeInTheDocument();
+    expect(screen.getByText("Dilshod Fayzullayev")).toBeInTheDocument();
+    expect(screen.getByText("Dylan")).toBeInTheDocument();
+    expect(screen.getAllByText(/codingbat\.com/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(/Voluntary diagnostics only:/i)
+    ).toBeInTheDocument();
   });
 
   it("renders ProgressPage with database-derived metrics and achievements", async () => {

@@ -156,6 +156,7 @@ describe("Design System UI Components", () => {
     expect(root.dataset.theme).toBe("light");
     expect(root.dataset.accent).toBe("violet");
     expect(root.dataset.fontFamily).toBe("outfit");
+    expect(root.dataset.editorFont).toBe("jetbrains-mono");
     expect(root.dataset.fontScale).toBe("lg");
 
     fireEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
