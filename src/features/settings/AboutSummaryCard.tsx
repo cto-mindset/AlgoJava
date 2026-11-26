@@ -79,7 +79,7 @@ export function AboutSummaryCard() {
               Algo<span className="text-[var(--accent-light)]">Java</span>
             </div>
             <div className="text-xs text-[var(--text-muted)]">
-              Offline Desktop Edition
+              100% Free &amp; Offline · by Dilshod Fayzullayev (Dylan)
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@ export function AboutSummaryCard() {
           onClick={() => navigate("/about")}
           className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs font-medium text-[var(--accent-light)] hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
         >
-          <span>Open Source Libraries</span>
+          <span>About &amp; Story</span>
           <IconExternalLink size={13} />
         </button>
         <button
@@ -129,7 +129,7 @@ export function AboutSummaryCard() {
           onClick={() => navigate("/about")}
           className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs font-medium text-[var(--accent-light)] hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
         >
-          <span>Credits</span>
+          <span>Privacy &amp; Security</span>
           <IconExternalLink size={13} />
         </button>
       </div>
