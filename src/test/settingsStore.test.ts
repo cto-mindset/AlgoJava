@@ -12,15 +12,18 @@ describe("Settings Store", () => {
 
   it("updates appearance and editor settings and persists locally", async () => {
     await useSettingsStore.getState().hydrateSettings();
+    expect(DEFAULT_SETTINGS.fontFamily).toBe("outfit");
     await useSettingsStore.getState().updateSettings({
       theme: "light",
       accentColor: "blue",
+      fontFamily: "jost",
       tabSize: 2,
     });
 
     const { settings } = useSettingsStore.getState();
     expect(settings.theme).toBe("light");
     expect(settings.accentColor).toBe("blue");
+    expect(settings.fontFamily).toBe("jost");
     expect(settings.tabSize).toBe(2);
   });
 

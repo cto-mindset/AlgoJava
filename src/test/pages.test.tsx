@@ -177,6 +177,14 @@ describe("AlgoJava Application Pages", () => {
     );
 
     expect(await screen.findByText("Data & Storage")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Settings sections" })).toBeInTheDocument();
+
+    const uiFontSelect = screen.getByLabelText("UI Font Family") as HTMLSelectElement;
+    expect(uiFontSelect.value).toBe("outfit");
+    fireEvent.change(uiFontSelect, { target: { value: "jost" } });
+    await waitFor(() => {
+      expect(useSettingsStore.getState().settings.fontFamily).toBe("jost");
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "Clear Cache" }));
     expect(
@@ -189,6 +197,10 @@ describe("AlgoJava Application Pages", () => {
     await waitFor(() => {
       expect(mockClearAppCache).toHaveBeenCalledTimes(1);
     });
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset Progress" }));
+    expect(screen.getByText("Reset All Progress?")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
   it("renders AboutPage security notice and open-source libraries", async () => {

@@ -1,13 +1,20 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
+import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { TitleBar } from "@/components/layout/TitleBar";
 import {
   Badge,
   Button,
   ConfirmDialog,
   ProgressBar,
   SegmentedControl,
+  SettingCard,
+  SettingRow,
   Switch,
 } from "@/components/ui";
+import { DEFAULT_SETTINGS, useSettingsStore } from "@/stores/settingsStore";
 
 describe("Design System UI Components", () => {
   it("renders Button with click and loading state", () => {
@@ -46,7 +53,7 @@ describe("Design System UI Components", () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
-  it("switches options in SegmentedControl", () => {
+  it("switches options in SegmentedControl with aria-pressed", () => {
     const onChange = vi.fn();
     render(
       <SegmentedControl<number>
@@ -60,7 +67,12 @@ describe("Design System UI Components", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "8" }));
+    const btn4 = screen.getByRole("button", { name: "4" });
+    const btn8 = screen.getByRole("button", { name: "8" });
+    expect(btn4).toHaveAttribute("aria-pressed", "true");
+    expect(btn8).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(btn8);
     expect(onChange).toHaveBeenCalledWith(8);
   });
 
@@ -97,5 +109,61 @@ describe("Design System UI Components", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders SettingCard and SettingRow primitives", () => {
+    render(
+      <SettingCard
+        id="test-card"
+        icon={<span data-testid="card-icon" />}
+        title="Typography"
+        description="Configure font family."
+      >
+        <SettingRow label="Font Family" description="Used across headings.">
+          <span>Outfit</span>
+        </SettingRow>
+      </SettingCard>
+    );
+
+    expect(screen.getByText("Typography")).toBeInTheDocument();
+    expect(screen.getByText("Font Family")).toBeInTheDocument();
+    expect(screen.getByText("Outfit")).toBeInTheDocument();
+  });
+
+  it("syncs ThemeProvider dataset attributes and toggles Sidebar/TitleBar", async () => {
+    useSettingsStore.setState({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        theme: "light",
+        accentColor: "violet",
+        fontFamily: "outfit",
+        fontSize: "lg",
+        sidebarCollapsed: false,
+      },
+      hydrated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/settings"]}>
+        <ThemeProvider>
+          <Sidebar />
+          <TitleBar />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    const root = document.documentElement;
+    expect(root.dataset.theme).toBe("light");
+    expect(root.dataset.accent).toBe("violet");
+    expect(root.dataset.fontFamily).toBe("outfit");
+    expect(root.dataset.fontScale).toBe("lg");
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
+    expect(useSettingsStore.getState().settings.sidebarCollapsed).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle theme" }));
+    await waitFor(() => {
+      expect(useSettingsStore.getState().settings.theme).toBe("dark");
+    });
   });
 });

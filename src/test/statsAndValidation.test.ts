@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatBytes, formatDurationMs } from "@/lib/utils/format";
+import { formatBytes, formatDurationMs, resolveUiFontCss } from "@/lib/utils/format";
 import { calculateCurrentStreak, evaluateAchievements } from "@/lib/utils/stats";
 import { validateProgressExportBundle } from "@/lib/validation/importExportValidation";
 
@@ -15,6 +15,12 @@ describe("Formatting utilities", () => {
     expect(formatDurationMs(42)).toBe("42 ms");
     expect(formatDurationMs(1500)).toBe("1.50s");
     expect(formatDurationMs(65_000)).toBe("1m 5s");
+  });
+
+  it("resolves UI font CSS stacks with Outfit as primary", () => {
+    expect(resolveUiFontCss("outfit")).toContain("'Outfit Variable'");
+    expect(resolveUiFontCss("jost")).toContain("'Jost Variable'");
+    expect(resolveUiFontCss("inter")).toContain("'Inter Variable'");
   });
 });
 
