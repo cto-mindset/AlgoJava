@@ -159,8 +159,17 @@ describe("Design System UI Components", () => {
     expect(root.dataset.editorFont).toBe("jetbrains-mono");
     expect(root.dataset.fontScale).toBe("lg");
 
+    expect(screen.getByText("Workspace")).toBeInTheDocument();
+    expect(screen.getByText("System")).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: "Collapse sidebar" }));
     expect(useSettingsStore.getState().settings.sidebarCollapsed).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Expand sidebar" })
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand sidebar" }));
+    expect(useSettingsStore.getState().settings.sidebarCollapsed).toBe(false);
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle theme" }));
     await waitFor(() => {
