@@ -311,5 +311,17 @@ describe("AlgoJava Application Pages", () => {
     expect(screen.getByText("26%")).toBeInTheDocument();
     expect(screen.getByText("First Steps")).toBeInTheDocument();
     expect(screen.getByText("Unlocked")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Nov 25: 2 attempts · 1 passed/i)
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Needs Focus" }));
+    expect(screen.getByRole("button", { name: "Needs Focus" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /View All/i }));
+    expect(screen.getByText("All Achievements")).toBeInTheDocument();
   });
 });
