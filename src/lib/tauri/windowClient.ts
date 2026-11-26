@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { isTauriRuntime } from "./env";
 
@@ -21,4 +22,17 @@ export async function isAppWindowMaximized(): Promise<boolean> {
 export async function closeAppWindow(): Promise<void> {
   if (!isTauriRuntime()) return;
   await getCurrentWindow().close();
+}
+
+export async function updateSplashStatus(
+  message: string,
+  progress: number
+): Promise<void> {
+  if (!isTauriRuntime()) return;
+  await invoke("update_splash_status", { message, progress });
+}
+
+export async function finishSplashScreen(): Promise<void> {
+  if (!isTauriRuntime()) return;
+  await invoke("finish_splash_screen");
 }
