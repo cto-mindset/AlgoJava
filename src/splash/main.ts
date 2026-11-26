@@ -8,15 +8,38 @@ interface SplashProgressPayload {
   progress: number;
 }
 
+const STAGE_THRESHOLDS: Array<{ key: string; min: number; doneAt: number }> = [
+  { key: "preferences", min: 0, doneAt: 55 },
+  { key: "database", min: 55, doneAt: 82 },
+  { key: "jdk", min: 82, doneAt: 100 },
+  { key: "workspace", min: 100, doneAt: 101 },
+];
+
 const statusEl = document.getElementById("splash-status");
 const percentEl = document.getElementById("splash-percent");
 const barEl = document.getElementById("splash-bar");
+
+function updateChecklistStages(clamped: number): void {
+  for (const stage of STAGE_THRESHOLDS) {
+    const el = document.querySelector<HTMLElement>(`[data-stage="${stage.key}"]`);
+    if (!el) continue;
+
+    if (clamped >= stage.doneAt) {
+      el.dataset.state = "done";
+    } else if (clamped >= stage.min) {
+      el.dataset.state = "active";
+    } else {
+      el.dataset.state = "pending";
+    }
+  }
+}
 
 function applyProgress(message: string, progress: number): void {
   const clamped = Math.max(0, Math.min(100, Math.round(progress)));
   if (statusEl) statusEl.textContent = message;
   if (percentEl) percentEl.textContent = `${clamped}%`;
   if (barEl) barEl.style.width = `${clamped}%`;
+  updateChecklistStages(clamped);
 }
 
 function waitTwoFrames(): Promise<void> {

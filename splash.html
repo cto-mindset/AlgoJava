@@ -7,8 +7,11 @@
     <style>
       :root {
         --splash-bg: #090912;
+        --splash-surface: rgba(18, 18, 34, 0.82);
         --splash-border: rgba(148, 163, 184, 0.16);
+        --splash-accent: #7c3aed;
         --splash-accent-light: #a78bfa;
+        --splash-success: #22c55e;
         --splash-text: #f1f5f9;
         --splash-muted: #9aa6be;
         --splash-dim: #6b7894;
@@ -39,16 +42,39 @@
         justify-content: space-between;
         width: 100%;
         height: 100%;
-        padding: 22px 26px 20px;
+        padding: 22px 28px 20px;
         background: radial-gradient(
-            ellipse 80% 90% at 88% 12%,
-            rgba(124, 58, 237, 0.22) 0%,
-            rgba(49, 46, 129, 0.12) 45%,
-            transparent 75%
+            ellipse 80% 95% at 86% 12%,
+            rgba(124, 58, 237, 0.24) 0%,
+            rgba(49, 46, 129, 0.12) 48%,
+            transparent 76%
+          ),
+          radial-gradient(
+            ellipse 65% 75% at 10% 92%,
+            rgba(56, 189, 248, 0.08) 0%,
+            transparent 70%
           ),
           var(--splash-bg);
         border: 1px solid rgba(139, 92, 246, 0.34);
         overflow: hidden;
+      }
+
+      /* Top specular hairline */
+      .splash-shell::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 24px;
+        right: 24px;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(167, 139, 250, 0.65) 50%,
+          transparent 100%
+        );
+        pointer-events: none;
+        z-index: 3;
       }
 
       .splash-grid {
@@ -57,30 +83,30 @@
         pointer-events: none;
         background-image: radial-gradient(rgba(167, 139, 250, 0.16) 1px, transparent 1px);
         background-size: 20px 20px;
-        mask-image: radial-gradient(ellipse 85% 90% at 70% 45%, #000 25%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 85% 90% at 70% 45%, #000 25%, transparent 100%);
+        mask-image: radial-gradient(ellipse 85% 90% at 68% 45%, #000 28%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 85% 90% at 68% 45%, #000 28%, transparent 100%);
       }
 
       .splash-orb {
         position: absolute;
         border-radius: 9999px;
-        filter: blur(44px);
+        filter: blur(48px);
         pointer-events: none;
       }
 
       .splash-orb-primary {
-        top: -70px;
-        right: -50px;
-        width: 210px;
-        height: 210px;
+        top: -80px;
+        right: -60px;
+        width: 230px;
+        height: 230px;
         background: rgba(124, 58, 237, 0.28);
       }
 
       .splash-orb-secondary {
-        bottom: -80px;
-        left: -40px;
-        width: 180px;
-        height: 180px;
+        bottom: -85px;
+        left: -45px;
+        width: 190px;
+        height: 190px;
         background: rgba(56, 189, 248, 0.12);
       }
 
@@ -95,13 +121,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 12px;
       }
 
       .splash-pill {
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        padding: 4px 10px;
+        padding: 4px 11px;
         border-radius: 9999px;
         background: rgba(124, 58, 237, 0.16);
         border: 1px solid rgba(139, 92, 246, 0.4);
@@ -115,8 +142,14 @@
         width: 6px;
         height: 6px;
         border-radius: 9999px;
-        background: #22c55e;
-        box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+        background: var(--splash-success);
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.85);
+      }
+
+      .splash-top-badges {
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
 
       .splash-badge {
@@ -129,23 +162,31 @@
         font-weight: 500;
       }
 
+      .splash-badge-version {
+        font-family: "JetBrains Mono Variable", "Consolas", monospace;
+        color: var(--splash-accent-light);
+        border-color: rgba(139, 92, 246, 0.35);
+        background: rgba(124, 58, 237, 0.1);
+      }
+
       .splash-center {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 18px;
+        gap: 22px;
       }
 
       .splash-brand {
         display: flex;
         align-items: center;
         gap: 16px;
+        min-width: 0;
       }
 
       .splash-logo-wrap {
         position: relative;
-        width: 58px;
-        height: 58px;
+        width: 64px;
+        height: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -154,31 +195,35 @@
 
       .splash-logo-ring {
         position: absolute;
-        inset: -4px;
-        border-radius: 16px;
-        border: 1px solid rgba(167, 139, 250, 0.45);
+        inset: -5px;
+        border-radius: 18px;
+        border: 1px solid rgba(167, 139, 250, 0.48);
         animation: splash-pulse 2.2s ease-in-out infinite;
       }
 
       .splash-logo {
         position: relative;
-        width: 58px;
-        height: 58px;
-        border-radius: 14px;
+        width: 64px;
+        height: 64px;
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ffffff;
         background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
-          0 10px 26px -6px rgba(124, 58, 237, 0.55);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+          0 14px 30px -6px rgba(124, 58, 237, 0.58);
+      }
+
+      .splash-title-group {
+        min-width: 0;
       }
 
       .splash-wordmark {
-        font-size: 32px;
+        font-size: 36px;
         font-weight: 700;
         letter-spacing: -0.03em;
-        line-height: 1.05;
+        line-height: 1.04;
         color: var(--splash-text);
       }
 
@@ -190,74 +235,108 @@
       }
 
       .splash-subtitle {
-        margin-top: 5px;
+        margin-top: 6px;
         font-size: 12.5px;
         font-weight: 500;
         color: var(--splash-muted);
       }
 
-      .splash-code-chip {
-        width: 152px;
+      /* Live Boot Checklist Panel */
+      .splash-checklist {
+        width: 196px;
         flex-shrink: 0;
-        border-radius: 10px;
-        background: rgba(14, 14, 27, 0.9);
+        border-radius: 12px;
+        background: var(--splash-surface);
         border: 1px solid var(--splash-border);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04),
-          0 12px 28px rgba(0, 0, 0, 0.4);
-        overflow: hidden;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 14px 30px rgba(0, 0, 0, 0.36);
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
       }
 
-      .splash-code-header {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 6px 9px;
-        background: rgba(25, 25, 48, 0.9);
+      .splash-checklist-title {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--splash-dim);
+        padding-bottom: 4px;
         border-bottom: 1px solid rgba(148, 163, 184, 0.1);
       }
 
-      .splash-code-header .dot {
-        width: 6px;
-        height: 6px;
+      .splash-stage {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: var(--splash-dim);
+        transition: color 180ms ease;
+      }
+
+      .splash-stage-indicator {
+        position: relative;
+        width: 15px;
+        height: 15px;
         border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        background: rgba(15, 23, 42, 0.6);
+        transition: all 180ms ease;
       }
 
-      .splash-code-header .dot-r {
-        background: rgba(251, 113, 133, 0.85);
-      }
-      .splash-code-header .dot-y {
-        background: rgba(251, 191, 36, 0.85);
-      }
-      .splash-code-header .dot-g {
-        background: rgba(52, 211, 153, 0.85);
+      .splash-stage-indicator svg {
+        width: 10px;
+        height: 10px;
+        opacity: 0;
+        transform: scale(0.7);
+        transition: all 180ms ease;
       }
 
-      .splash-code-file {
-        margin-left: auto;
-        font-family: "JetBrains Mono Variable", "Consolas", monospace;
-        font-size: 9.5px;
+      .splash-stage-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 9999px;
+        background: rgba(148, 163, 184, 0.45);
+        transition: all 180ms ease;
+      }
+
+      .splash-stage[data-state="active"] {
+        color: var(--splash-text);
+      }
+
+      .splash-stage[data-state="active"] .splash-stage-indicator {
+        border-color: rgba(167, 139, 250, 0.65);
+        background: rgba(124, 58, 237, 0.2);
+        box-shadow: 0 0 10px rgba(124, 58, 237, 0.45);
+      }
+
+      .splash-stage[data-state="active"] .splash-stage-dot {
+        background: var(--splash-accent-light);
+      }
+
+      .splash-stage[data-state="done"] {
         color: var(--splash-muted);
       }
 
-      .splash-code-body {
-        padding: 8px 10px;
-        font-family: "JetBrains Mono Variable", "Consolas", monospace;
-        font-size: 10px;
-        line-height: 1.5;
-        color: #cbd5e1;
+      .splash-stage[data-state="done"] .splash-stage-indicator {
+        border-color: rgba(34, 197, 94, 0.5);
+        background: rgba(34, 197, 94, 0.16);
+        color: var(--splash-success);
       }
 
-      .splash-code-body .kw {
-        color: #c084fc;
+      .splash-stage[data-state="done"] .splash-stage-dot {
+        display: none;
       }
-      .splash-code-body .tp {
-        color: #fbbf24;
-      }
-      .splash-code-body .fn {
-        color: #60a5fa;
-      }
-      .splash-code-body .str {
-        color: #4ade80;
+
+      .splash-stage[data-state="done"] .splash-stage-indicator svg {
+        opacity: 1;
+        transform: scale(1);
       }
 
       .splash-footer {
@@ -296,11 +375,26 @@
       }
 
       .splash-bar {
+        position: relative;
         height: 100%;
         border-radius: 9999px;
         background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 60%, #60a5fa 100%);
         transition: width 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
         box-shadow: 0 0 12px rgba(124, 58, 237, 0.55);
+        overflow: hidden;
+      }
+
+      .splash-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.35) 50%,
+          transparent 100%
+        );
+        animation: splash-shimmer 1.5s ease-in-out infinite;
       }
 
       .splash-meta {
@@ -318,16 +412,28 @@
           transform: scale(1);
         }
         50% {
-          opacity: 0.9;
+          opacity: 0.92;
           transform: scale(1.06);
         }
       }
 
+      @keyframes splash-shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        .splash-logo-ring {
+        .splash-logo-ring,
+        .splash-bar::after {
           animation: none;
         }
-        .splash-bar {
+        .splash-bar,
+        .splash-stage,
+        .splash-stage-indicator {
           transition: none;
         }
       }
@@ -345,7 +451,10 @@
           <span class="splash-pill-dot"></span>
           <span>Offline Java Studio</span>
         </div>
-        <div class="splash-badge">100% Free &amp; Offline</div>
+        <div class="splash-top-badges">
+          <span class="splash-badge">100% Free &amp; Offline</span>
+          <span class="splash-badge splash-badge-version">v0.2.0</span>
+        </div>
       </header>
 
       <!-- Center Hero Composition -->
@@ -355,8 +464,8 @@
             <div class="splash-logo-ring" aria-hidden="true"></div>
             <div class="splash-logo">
               <svg
-                width="28"
-                height="28"
+                width="30"
+                height="30"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -382,18 +491,36 @@
           </div>
         </div>
 
-        <aside class="splash-code-chip" aria-hidden="true">
-          <div class="splash-code-header">
-            <span class="dot dot-r"></span>
-            <span class="dot dot-y"></span>
-            <span class="dot dot-g"></span>
-            <span class="splash-code-file">Solution.java</span>
+        <aside class="splash-checklist" aria-label="Startup stages">
+          <div class="splash-checklist-title">Boot Sequence</div>
+          <div class="splash-stage" data-stage="preferences" data-state="active">
+            <span class="splash-stage-indicator">
+              <span class="splash-stage-dot"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg>
+            </span>
+            <span>Preferences</span>
           </div>
-          <pre class="splash-code-body"><span class="kw">class</span> <span class="tp">Solution</span> {
-  <span class="kw">int</span> <span class="fn">boot</span>() {
-    <span class="kw">return</span> <span class="str">1</span>;
-  }
-}</pre>
+          <div class="splash-stage" data-stage="database" data-state="pending">
+            <span class="splash-stage-indicator">
+              <span class="splash-stage-dot"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg>
+            </span>
+            <span>Local SQLite</span>
+          </div>
+          <div class="splash-stage" data-stage="jdk" data-state="pending">
+            <span class="splash-stage-indicator">
+              <span class="splash-stage-dot"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg>
+            </span>
+            <span>Java JDK</span>
+          </div>
+          <div class="splash-stage" data-stage="workspace" data-state="pending">
+            <span class="splash-stage-indicator">
+              <span class="splash-stage-dot"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg>
+            </span>
+            <span>Workspace</span>
+          </div>
         </aside>
       </main>
 
@@ -409,7 +536,7 @@
           <div id="splash-bar" class="splash-bar" style="width: 12%"></div>
         </div>
         <div class="splash-meta">
-          <span>v0.1.0</span>
+          <span>Native Rust Core</span>
           <span>by Dilshod Fayzullayev (Dylan)</span>
         </div>
       </footer>
