@@ -88,7 +88,7 @@ export function AboutSummaryCard() {
           <div>
             <div className="text-[var(--text-muted)]">Version</div>
             <div className="algo-tabular mt-0.5 font-semibold text-[var(--text-primary)]">
-              {buildInfo?.appVersion ?? "0.1.0"}
+              {buildInfo?.appVersion ?? "0.2.0"}
             </div>
           </div>
           <div>
