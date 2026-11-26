@@ -95,6 +95,28 @@ export function ProblemSolverPage() {
   const [lastMode, setLastMode] = useState<"run" | "submit" | null>(null);
 
   const autoSaveTimerRef = useRef<number | null>(null);
+  const quickSettingsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!quickSettingsOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (
+        quickSettingsRef.current &&
+        !quickSettingsRef.current.contains(e.target as Node)
+      ) {
+        setQuickSettingsOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setQuickSettingsOpen(false);
+    };
+    window.addEventListener("mousedown", handleOutside);
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [quickSettingsOpen]);
 
   const loadProblem = useCallback(async () => {
     if (!slug) return;
@@ -322,7 +344,7 @@ export function ProblemSolverPage() {
   const isBookmarked = problem.progress?.bookmarked ?? false;
 
   return (
-    <div className="mx-auto flex h-full max-w-[1440px] flex-col gap-4 p-4 lg:p-5 overflow-hidden">
+    <div className="mx-auto flex min-h-full lg:h-full max-w-[1440px] flex-col gap-4 p-4 lg:p-5 overflow-y-auto lg:overflow-hidden">
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-12">
         {/* Left Problem Description Pane */}
         {!isFullscreenEditor && (
@@ -556,7 +578,10 @@ export function ProblemSolverPage() {
 
             {/* Quick Editor Popover */}
             {quickSettingsOpen && (
-              <div className="absolute right-3 top-12 z-30 w-64 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface-elevated)] p-3.5 shadow-[var(--shadow-md)] space-y-3 text-xs">
+              <div
+                ref={quickSettingsRef}
+                className="algo-animate-dropdown absolute right-3 top-12 z-30 w-68 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface-elevated)] p-3.5 shadow-[var(--surface-highlight),var(--shadow-md)] space-y-3 text-xs"
+              >
                 <div className="flex items-center justify-between font-semibold text-[var(--text-primary)]">
                   <span>Editor Settings</span>
                   <button

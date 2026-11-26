@@ -81,7 +81,7 @@ export function TestResultsPanel({
           )}
           {!running && outcome && (
             <>
-              <span className="inline-flex items-center gap-1 text-[var(--text-muted)]">
+              <span className="algo-tabular inline-flex items-center gap-1 text-[var(--text-muted)]">
                 <IconClock size={13} />
                 {outcome.executionTimeMs} ms
               </span>

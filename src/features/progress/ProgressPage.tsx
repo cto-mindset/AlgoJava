@@ -70,20 +70,20 @@ export function ProgressPage() {
   );
 
   return (
-    <div className="mx-auto max-w-[1280px] space-y-5 p-6">
+    <div className="mx-auto max-w-[1320px] space-y-5 p-6">
       {/* Header Hero + 4 KPI Cards */}
       <section className="algo-surface algo-hero-backdrop p-6 space-y-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent-light)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent-light)]">
                 <IconChartBar size={22} />
               </div>
-              <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+              <h1 className="text-3xl font-bold tracking-[-0.02em] text-[var(--text-primary)]">
                 Your <span className="algo-accent-text">Progress</span>
               </h1>
             </div>
-            <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Track your journey and see how much you've improved.
             </p>
           </div>
@@ -100,11 +100,11 @@ export function ProgressPage() {
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-bold text-[var(--text-primary)]">
+                <span className="algo-tabular text-2xl font-bold text-[var(--text-primary)]">
                   {data.solvedProblems}
                 </span>
                 {data.weeklySolvedDelta > 0 && (
-                  <span className="text-xs font-semibold text-[var(--status-success)]">
+                  <span className="algo-tabular text-xs font-semibold text-[var(--status-success)]">
                     +{data.weeklySolvedDelta} 7d
                   </span>
                 )}
@@ -121,10 +121,10 @@ export function ProgressPage() {
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-bold text-[var(--text-primary)]">
+                <span className="algo-tabular text-2xl font-bold text-[var(--text-primary)]">
                   {data.totalAttempts}
                 </span>
-                <span className="text-xs font-medium text-[var(--text-secondary)]">
+                <span className="algo-tabular text-xs font-medium text-[var(--text-secondary)]">
                   {data.successRate}% pass rate
                 </span>
               </div>
@@ -140,10 +140,10 @@ export function ProgressPage() {
             </span>
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-bold text-[var(--text-primary)]">
+                <span className="algo-tabular text-2xl font-bold text-[var(--text-primary)]">
                   {data.overallPercentage}%
                 </span>
-                <span className="text-xs text-[var(--text-muted)]">
+                <span className="algo-tabular text-xs text-[var(--text-muted)]">
                   {data.solvedProblems}/{data.totalProblems}
                 </span>
               </div>
@@ -164,10 +164,10 @@ export function ProgressPage() {
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-bold text-[var(--text-primary)]">
+                <span className="algo-tabular text-2xl font-bold text-[var(--text-primary)]">
                   {data.currentStreakDays}d
                 </span>
-                <span className="text-xs text-[var(--text-muted)]">
+                <span className="algo-tabular text-xs text-[var(--text-muted)]">
                   {formatDurationMs(data.totalExecutionTimeMs)}
                 </span>
               </div>
@@ -197,7 +197,7 @@ export function ProgressPage() {
             }
           />
 
-          <div className="space-y-3.5">
+          <div className="space-y-2.5">
             {visibleCategories.map((cat) => {
               const pct =
                 cat.totalProblems > 0
@@ -208,26 +208,26 @@ export function ProgressPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => navigate(`/problems?category=${cat.id}`)}
-                  className="grid w-full grid-cols-12 items-center gap-3 rounded-[var(--radius-sm)] px-2 py-1.5 text-left hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+                  className="grid w-full grid-cols-12 items-center gap-3 rounded-[var(--radius-sm)] px-2.5 py-2 text-left hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
                 >
-                  <div className="col-span-4 flex items-center gap-2.5 min-w-0">
+                  <div className="col-span-5 sm:col-span-4 flex items-center gap-2.5 min-w-0">
                     <CategoryIcon icon={cat.icon} color={cat.accentColor} size={17} />
                     <span className="text-sm font-medium text-[var(--text-primary)] truncate">
                       {cat.name}
                     </span>
                   </div>
-                  <div className="col-span-2 text-right text-xs font-medium text-[var(--text-secondary)]">
+                  <div className="algo-tabular col-span-2 text-right text-xs font-medium text-[var(--text-secondary)]">
                     {cat.solvedProblems} / {cat.totalProblems}
                   </div>
-                  <div className="col-span-4">
+                  <div className="col-span-3 sm:col-span-4">
                     <ProgressBar
                       value={cat.solvedProblems}
                       max={cat.totalProblems}
                       color={cat.accentColor}
-                      heightClassName="h-2.5"
+                      heightClassName="h-2"
                     />
                   </div>
-                  <div className="col-span-2 text-right text-xs font-semibold text-[var(--text-primary)]">
+                  <div className="algo-tabular col-span-2 text-right text-xs font-semibold text-[var(--text-primary)]">
                     {pct}%
                   </div>
                 </button>
@@ -282,14 +282,14 @@ export function ProgressPage() {
                   <button
                     type="button"
                     onClick={() => navigate(`/problems/${item.problemSlug}`)}
-                    className="flex w-full items-center justify-between gap-3 py-2.5 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left cursor-pointer"
+                    className="flex w-full items-center justify-between gap-3 py-2.5 px-2.5 rounded-[var(--radius-sm)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span
                         className={
                           item.status === "passed"
-                            ? "flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-[var(--status-success-soft)] text-[var(--status-success)]"
-                            : "flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-[var(--status-warning-soft)] text-[var(--status-warning)]"
+                            ? "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--status-success-soft)] text-[var(--status-success)]"
+                            : "flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--status-warning-soft)] text-[var(--status-warning)]"
                         }
                       >
                         {item.status === "passed" ? (
@@ -298,7 +298,7 @@ export function ProgressPage() {
                           <IconPlayerPlay size={12} />
                         )}
                       </span>
-                      <span className="truncate text-sm text-[var(--text-primary)]">
+                      <span className="truncate text-[13.5px] text-[var(--text-primary)]">
                         <span className="font-semibold">
                           {item.status === "passed" ? "Solved:" : "Tried:"}
                         </span>{" "}
@@ -308,7 +308,7 @@ export function ProgressPage() {
                         </span>
                       </span>
                     </div>
-                    <span className="shrink-0 text-xs text-[var(--text-muted)]">
+                    <span className="algo-tabular shrink-0 text-xs text-[var(--text-muted)]">
                       {formatRelativeTimestamp(item.submittedAt)}
                     </span>
                   </button>
@@ -336,13 +336,13 @@ export function ProgressPage() {
                   <div
                     key={day.date}
                     title={`${day.label}: ${day.attempts} attempt(s), ${day.passed} passed`}
-                    className="flex flex-1 flex-col items-center justify-end gap-1 h-full"
+                    className="group flex flex-1 flex-col items-center justify-end gap-1 h-full"
                   >
                     <div
                       className={cn(
                         "w-full rounded-t-[4px] transition-all",
                         day.attempts > 0
-                          ? "bg-[var(--accent-primary)]"
+                          ? "bg-[var(--accent-primary)] group-hover:bg-[var(--accent-light)]"
                           : "bg-[var(--track-bg)]"
                       )}
                       style={{ height: `${heightPct}%` }}
@@ -363,10 +363,10 @@ export function ProgressPage() {
               <h3 className="text-lg font-bold text-[var(--text-primary)]">
                 Keep Going!
               </h3>
-              <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
+              <p className="mt-1 text-[13px] leading-relaxed text-[var(--text-secondary)]">
                 Consistent daily Java practice builds lasting problem-solving fluency.
               </p>
-              <div className="mt-3">
+              <div className="mt-3.5">
                 <Button
                   variant="primary"
                   size="sm"
@@ -419,7 +419,7 @@ function AchievementCard({
     <div
       className={cn(
         "algo-surface-elevated flex flex-col items-center justify-between p-3.5 text-center transition-opacity",
-        !achievement.unlocked && "opacity-70"
+        !achievement.unlocked && "opacity-75"
       )}
     >
       <div
@@ -431,20 +431,20 @@ function AchievementCard({
         <IconAward size={22} />
       </div>
       <div>
-        <h4 className="text-xs font-semibold text-[var(--text-primary)]">
+        <h4 className="text-[13px] font-semibold text-[var(--text-primary)]">
           {achievement.title}
         </h4>
-        <p className="mt-1 text-[11px] leading-snug text-[var(--text-secondary)]">
+        <p className="mt-1 text-[11.5px] leading-snug text-[var(--text-secondary)]">
           {achievement.description}
         </p>
       </div>
-      <div className="mt-2.5 w-full space-y-1">
+      <div className="mt-3 w-full space-y-1.5">
         {achievement.unlocked ? (
-          <Badge tone="success" className="text-[10px]">
+          <Badge tone="success" className="text-[10.5px]">
             Unlocked
           </Badge>
         ) : (
-          <span className="text-[10px] font-medium text-[var(--text-muted)]">
+          <span className="algo-tabular text-[11px] font-medium text-[var(--text-muted)]">
             {achievement.currentValue} / {achievement.targetValue}
           </span>
         )}

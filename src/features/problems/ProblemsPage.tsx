@@ -115,7 +115,7 @@ export function ProblemsPage() {
   }, [categories]);
 
   return (
-    <div className="mx-auto flex h-full max-w-[1320px] flex-col gap-5 p-6">
+    <div className="mx-auto flex h-full max-w-[1360px] flex-col gap-5 p-6">
       {/* Top Header + Search / Filters */}
       <PageHeader
         icon={<IconLayersSubtract size={22} />}
@@ -129,7 +129,7 @@ export function ProblemsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               leftIcon={<IconSearch size={15} />}
-              containerClassName="w-60"
+              containerClassName="w-64"
             />
             <Select<DifficultyFilter>
               ariaLabel="Filter by difficulty"
@@ -153,7 +153,7 @@ export function ProblemsPage() {
                 { value: "solved", label: "Solved" },
                 { value: "bookmarked", label: "Bookmarked" },
               ]}
-              className="w-32"
+              className="w-34"
             />
           </div>
         }
@@ -164,7 +164,7 @@ export function ProblemsPage() {
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 lg:grid-cols-12">
           {/* Categories Panel (4 cols) */}
-          <aside className="algo-surface flex flex-col p-4 lg:col-span-4 overflow-y-auto">
+          <aside className="algo-surface flex max-h-64 lg:max-h-none flex-col p-4 lg:col-span-4 overflow-y-auto">
             <div className="mb-3 flex items-center justify-between px-1">
               <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
                 <IconLayoutGrid size={17} className="text-[var(--accent-light)]" />
@@ -173,7 +173,7 @@ export function ProblemsPage() {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-2 py-1 text-xs font-medium text-[var(--accent-light)] hover:bg-[var(--accent-soft)] cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-2 py-1 text-xs font-medium text-[var(--accent-light)] hover:bg-[var(--accent-soft)] transition-colors cursor-pointer"
               >
                 <IconRefresh size={13} />
                 <span>Reset</span>
@@ -185,21 +185,21 @@ export function ProblemsPage() {
                 type="button"
                 onClick={() => handleSelectCategory("all")}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-[var(--radius-md)] border px-3.5 py-2.5 text-left transition-all cursor-pointer",
+                  "relative flex w-full items-center justify-between rounded-[var(--radius-md)] border px-3.5 py-2.5 text-left transition-all duration-150 cursor-pointer",
                   selectedCategory === "all"
-                    ? "border-[var(--accent-border)] bg-[var(--accent-primary)]/18 text-[var(--text-primary)]"
+                    ? "border-[var(--accent-border)] bg-[var(--accent-soft)] text-[var(--text-primary)] shadow-[var(--surface-highlight)]"
                     : "border-transparent hover:bg-[var(--bg-surface-hover)] text-[var(--text-secondary)]"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-input)] text-[var(--accent-light)]">
-                    <IconLayersSubtract size={18} />
+                  <span className="flex h-8.5 w-8.5 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--accent-light)]">
+                    <IconLayersSubtract size={17} />
                   </span>
                   <div>
                     <div className="text-sm font-semibold text-[var(--text-primary)]">
                       All Categories
                     </div>
-                    <div className="text-xs text-[var(--text-muted)]">
+                    <div className="algo-tabular text-xs text-[var(--text-muted)]">
                       {totals.total} problems
                     </div>
                   </div>
@@ -217,21 +217,27 @@ export function ProblemsPage() {
                     type="button"
                     onClick={() => handleSelectCategory(cat.id)}
                     className={cn(
-                      "flex w-full items-center justify-between rounded-[var(--radius-md)] border px-3.5 py-2.5 text-left transition-all cursor-pointer",
+                      "relative flex w-full items-center justify-between rounded-[var(--radius-md)] border px-3.5 py-2.5 text-left transition-all duration-150 cursor-pointer",
                       active
-                        ? "border-[var(--accent-border)] bg-[var(--accent-primary)]/18 text-[var(--text-primary)]"
+                        ? "border-[var(--accent-border)] bg-[var(--accent-soft)] text-[var(--text-primary)] shadow-[var(--surface-highlight)]"
                         : "border-transparent hover:bg-[var(--bg-surface-hover)] text-[var(--text-secondary)]"
                     )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-input)]">
-                        <CategoryIcon icon={cat.icon} color={cat.accentColor} size={18} />
+                      <span
+                        className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border"
+                        style={{
+                          backgroundColor: `${cat.accentColor}16`,
+                          borderColor: `${cat.accentColor}30`,
+                        }}
+                      >
+                        <CategoryIcon icon={cat.icon} color={cat.accentColor} size={17} />
                       </span>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold text-[var(--text-primary)] truncate">
                           {cat.name}
                         </div>
-                        <div className="text-xs text-[var(--text-muted)]">
+                        <div className="algo-tabular text-xs text-[var(--text-muted)]">
                           {cat.solvedProblems}/{cat.totalProblems} solved ·{" "}
                           {cat.totalProblems} problems
                         </div>
@@ -271,15 +277,15 @@ export function ProblemsPage() {
                   key={problem.id}
                   type="button"
                   onClick={() => navigate(`/problems/${problem.slug}`)}
-                  className="group flex w-full items-center justify-between gap-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5 text-left transition-all duration-150 hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-elevated)] cursor-pointer"
+                  className="group flex w-full items-center justify-between gap-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5 text-left shadow-[var(--surface-highlight)] transition-all duration-150 hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)] cursor-pointer"
                 >
                   <div className="flex items-center gap-4 min-w-0">
-                    <span className="w-7 shrink-0 text-center text-sm font-semibold text-[var(--text-muted)]">
+                    <span className="algo-tabular w-7 shrink-0 text-center text-sm font-semibold text-[var(--text-muted)]">
                       {index + 1}
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--accent-light)] transition-colors">
+                        <h3 className="text-[14.5px] font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--accent-light)] transition-colors">
                           {problem.title}
                         </h3>
                         {problem.bookmarked && (
@@ -289,7 +295,7 @@ export function ProblemsPage() {
                           />
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-[var(--text-secondary)] truncate">
+                      <p className="mt-0.5 text-[12.5px] text-[var(--text-secondary)] truncate">
                         {problem.summary}
                       </p>
                     </div>
@@ -328,7 +334,7 @@ export function ProblemsPage() {
 
                     <IconChevronRight
                       size={16}
-                      className="text-[var(--text-muted)] group-hover:text-[var(--text-primary)]"
+                      className="text-[var(--text-muted)] transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-[var(--text-primary)]"
                     />
                   </div>
                 </button>
@@ -340,7 +346,7 @@ export function ProblemsPage() {
 
       {/* Bottom Summary Footer */}
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-3">
-        <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
+        <div className="algo-tabular flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
           <IconInfoCircle size={16} className="text-[var(--accent-light)]" />
           <span>
             Total Problems:{" "}
