@@ -11,3 +11,14 @@ font-family: 'JetBrains Mono Variable', monospace;
 font-family: 'Google Sans Code Variable', monospace;
 ```
 
+### new fonts
+
+```bash
+import '@fontsource-variable/jost';
+import '@fontsource-variable/outfit';
+```
+
+```css
+font-family: 'Jost Variable', sans-serif;
+font-family: 'Outfit Variable', sans-serif;
+```

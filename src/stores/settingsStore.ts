@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   userName: "Developer",
   theme: "dark",
   accentColor: "violet",
+  fontFamily: "outfit",
   fontSize: "md",
   sidebarCollapsed: false,
   animations: true,

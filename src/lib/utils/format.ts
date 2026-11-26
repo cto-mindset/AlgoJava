@@ -1,5 +1,5 @@
 import { formatDistanceToNow, parseISO } from "date-fns";
-import type { EditorFontFamily } from "@/types/models";
+import type { EditorFontFamily, UiFontFamily } from "@/types/models";
 
 export function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
@@ -32,6 +32,18 @@ export function formatRelativeTimestamp(isoString: string): string {
     return formatDistanceToNow(parsed, { addSuffix: true });
   } catch {
     return isoString;
+  }
+}
+
+export function resolveUiFontCss(family: UiFontFamily): string {
+  switch (family) {
+    case "jost":
+      return "'Jost Variable', 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    case "inter":
+      return "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    case "outfit":
+    default:
+      return "'Outfit Variable', 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   }
 }
 

@@ -9,6 +9,7 @@ export type SubmissionStatus =
 
 export type ThemeMode = "dark" | "light" | "system";
 export type AccentColor = "violet" | "blue" | "emerald" | "orange" | "amber";
+export type UiFontFamily = "outfit" | "jost" | "inter";
 export type FontScale = "sm" | "md" | "lg";
 export type EditorFontFamily = "jetbrains-mono" | "geist-mono" | "google-sans-code";
 export type TabSizeOption = 2 | 4 | 8;
@@ -17,6 +18,7 @@ export interface AppSettings {
   userName: string;
   theme: ThemeMode;
   accentColor: AccentColor;
+  fontFamily: UiFontFamily;
   fontSize: FontScale;
   sidebarCollapsed: boolean;
   animations: boolean;

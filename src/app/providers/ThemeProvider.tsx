@@ -19,6 +19,7 @@ function resolveEffectiveTheme(mode: ThemeMode): "dark" | "light" {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const theme = useSettingsStore((s) => s.settings.theme);
   const accentColor = useSettingsStore((s) => s.settings.accentColor);
+  const fontFamily = useSettingsStore((s) => s.settings.fontFamily);
   const fontSize = useSettingsStore((s) => s.settings.fontSize);
   const animations = useSettingsStore((s) => s.settings.animations);
 
@@ -27,6 +28,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const apply = () => {
       root.dataset.theme = resolveEffectiveTheme(theme);
       root.dataset.accent = accentColor;
+      root.dataset.fontFamily = fontFamily;
       root.dataset.fontScale = fontSize;
       root.dataset.animations = animations ? "on" : "off";
     };
@@ -38,7 +40,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       media.addEventListener("change", apply);
       return () => media.removeEventListener("change", apply);
     }
-  }, [theme, accentColor, fontSize, animations]);
+  }, [theme, accentColor, fontFamily, fontSize, animations]);
 
   return <>{children}</>;
 }
