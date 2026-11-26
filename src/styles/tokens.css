@@ -7,6 +7,7 @@
   --font-mono-jetbrains: "JetBrains Mono Variable", "Consolas", monospace;
   --font-mono-geist: "Geist Mono Variable", "Consolas", monospace;
   --font-mono-google: "Google Sans Code Variable", "Consolas", monospace;
+  --font-mono: var(--font-mono-jetbrains);
 
   /* Spacing & Control Scale */
   --space-page-x: 1.5rem;
@@ -63,6 +64,19 @@
 
 :root[data-font-family="inter"] {
   --font-sans: var(--font-sans-inter);
+}
+
+/* Editor Monospace Font Options */
+:root[data-editor-font="jetbrains-mono"] {
+  --font-mono: var(--font-mono-jetbrains);
+}
+
+:root[data-editor-font="geist-mono"] {
+  --font-mono: var(--font-mono-geist);
+}
+
+:root[data-editor-font="google-sans-code"] {
+  --font-mono: var(--font-mono-google);
 }
 
 /* Font Scale Options */

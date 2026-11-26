@@ -129,7 +129,7 @@ export function DashboardHeroArtwork() {
         fill="var(--text-secondary)"
         fontSize="7.5"
         fontWeight="600"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         Solution.java
       </text>
@@ -149,7 +149,7 @@ export function DashboardHeroArtwork() {
         textAnchor="middle"
         fill="var(--text-muted)"
         fontSize="8.5"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         1
       </text>
@@ -159,7 +159,7 @@ export function DashboardHeroArtwork() {
         textAnchor="middle"
         fill="var(--text-muted)"
         fontSize="8.5"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         2
       </text>
@@ -170,7 +170,7 @@ export function DashboardHeroArtwork() {
         fill="var(--accent-light)"
         fontSize="8.5"
         fontWeight="700"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         3
       </text>
@@ -180,7 +180,7 @@ export function DashboardHeroArtwork() {
         textAnchor="middle"
         fill="var(--text-muted)"
         fontSize="8.5"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         4
       </text>
@@ -190,7 +190,7 @@ export function DashboardHeroArtwork() {
         textAnchor="middle"
         fill="var(--text-muted)"
         fontSize="8.5"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         5
       </text>
@@ -243,7 +243,7 @@ export function DashboardHeroArtwork() {
         fill="var(--text-primary)"
         fontSize="9.5"
         fontWeight="600"
-        fontFamily="sans-serif"
+        fontFamily="var(--font-sans)"
       >
         Tests Passed
       </text>
@@ -266,7 +266,7 @@ export function DashboardHeroArtwork() {
         fill="var(--accent-light)"
         fontSize="16"
         fontWeight="700"
-        fontFamily="monospace"
+        fontFamily="var(--font-mono)"
       >
         &lt;/&gt;
       </text>
