@@ -126,7 +126,7 @@ export function TestResultsPanel({
               variant="secondary"
               size="sm"
               leftIcon={<IconSettings size={14} />}
-              onClick={() => navigate("/settings")}
+              onClick={() => navigate("/settings?tab=runtime")}
             >
               Configure JDK
             </Button>
@@ -148,7 +148,7 @@ export function TestResultsPanel({
                 variant="secondary"
                 size="sm"
                 leftIcon={<IconSettings size={14} />}
-                onClick={() => navigate("/settings")}
+                onClick={() => navigate("/settings?tab=runtime")}
               >
                 Open JDK Settings
               </Button>
