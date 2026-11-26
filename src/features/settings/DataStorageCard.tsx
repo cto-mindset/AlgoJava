@@ -8,7 +8,14 @@ import {
   IconTrash,
   IconUpload,
 } from "@tabler/icons-react";
-import { Button, ConfirmDialog, Dialog, Input, LoadingState } from "@/components/ui";
+import {
+  Button,
+  ConfirmDialog,
+  Dialog,
+  Input,
+  LoadingState,
+  SettingCard,
+} from "@/components/ui";
 import {
   exportProgressBundle,
   getDatabaseDetails,
@@ -193,72 +200,74 @@ export function DataStorageCard() {
   };
 
   return (
-    <section className="algo-surface p-5 space-y-4">
-      <div className="flex items-start gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent-light)]">
-          <IconDatabase size={18} />
-        </span>
-        <div>
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Data &amp; Storage
-          </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Manage your local SQLite database, backups, and temporary execution cache.
-          </p>
+    <SettingCard
+      id="settings-storage"
+      icon={<IconDatabase size={18} />}
+      title="Data & Storage"
+      description="Manage your local SQLite database, backups, and temporary execution cache."
+    >
+      <div className="space-y-1.5">
+        <label
+          htmlFor="settings-storage-location"
+          className="block text-[13.5px] font-medium text-[var(--text-primary)]"
+        >
+          Storage Location
+        </label>
+        <div className="flex items-center gap-2">
+          <Input
+            id="settings-storage-location"
+            readOnly
+            aria-label="Storage Location"
+            value={storageInfo?.storageDir ?? "Loading..."}
+            containerClassName="flex-1"
+          />
+          <Button
+            variant="secondary"
+            size="md"
+            title="Open storage folder"
+            onClick={() =>
+              storageInfo && void openLocalDirectory(storageInfo.storageDir)
+            }
+            leftIcon={<IconFolderOpen size={15} />}
+          >
+            Open
+          </Button>
         </div>
       </div>
 
-      <div className="space-y-3 text-xs">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[var(--text-secondary)] shrink-0 w-28">
-            Storage Location
-          </span>
-          <div className="flex flex-1 items-center gap-1.5 min-w-0">
-            <Input
-              readOnly
-              aria-label="Storage Location"
-              value={storageInfo?.storageDir ?? "Loading..."}
-              containerClassName="flex-1"
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              title="Open storage folder"
-              onClick={() =>
-                storageInfo && void openLocalDirectory(storageInfo.storageDir)
-              }
-              leftIcon={<IconFolderOpen size={14} />}
-            >
-              Open
-            </Button>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-3.5 py-2.5">
+        <div>
+          <span className="text-xs text-[var(--text-muted)]">Database Size</span>
+          <div className="algo-tabular text-sm font-semibold text-[var(--text-primary)]">
+            {storageInfo ? formatBytes(storageInfo.dbSizeBytes) : "—"}
+            {storageInfo && storageInfo.cacheSizeBytes > 0 && (
+              <span className="ml-2 text-xs font-normal text-[var(--text-secondary)]">
+                (Cache: {formatBytes(storageInfo.cacheSizeBytes)})
+              </span>
+            )}
           </div>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          leftIcon={<IconEye size={14} />}
+          onClick={() => void handleOpenDetails()}
+        >
+          View Details
+        </Button>
+      </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[var(--text-secondary)] shrink-0 w-28">
-            Database Size
-          </span>
-          <div className="flex flex-1 items-center justify-between gap-2">
-            <span className="font-semibold text-[var(--text-primary)]">
-              {storageInfo ? formatBytes(storageInfo.dbSizeBytes) : "—"}
-              {storageInfo && storageInfo.cacheSizeBytes > 0 && (
-                <span className="ml-2 font-normal text-[var(--text-muted)]">
-                  (Cache: {formatBytes(storageInfo.cacheSizeBytes)})
-                </span>
-              )}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<IconEye size={14} />}
-              onClick={() => void handleOpenDetails()}
-            >
-              View Details
-            </Button>
-          </div>
+      {/* Backup & Restore */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-4">
+        <div>
+          <h3 className="text-[13.5px] font-medium text-[var(--text-primary)]">
+            Backup &amp; Restore
+          </h3>
+          <p className="text-xs text-[var(--text-muted)]">
+            Export or merge your problem progress and submissions as JSON.
+          </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2 pt-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -277,23 +286,37 @@ export function DataStorageCard() {
           >
             Import Progress
           </Button>
+        </div>
+      </div>
+
+      {/* Maintenance & Danger Zone */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--status-danger-border)]/70 bg-[var(--status-danger-soft)]/50 px-4 py-3">
+        <div>
+          <h3 className="text-[13.5px] font-medium text-[var(--text-primary)]">
+            Cache &amp; Progress Reset
+          </h3>
+          <p className="text-xs text-[var(--text-secondary)]">
+            Clear temporary compile files safely, or reset all saved SQLite progress.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
-            size="sm"
-            disabled={busy}
-            leftIcon={<IconRefresh size={14} />}
-            onClick={() => setConfirmResetOpen(true)}
-          >
-            Reset Progress
-          </Button>
-          <Button
-            variant="danger"
             size="sm"
             disabled={busy}
             leftIcon={<IconTrash size={14} />}
             onClick={() => setConfirmClearCacheOpen(true)}
           >
             Clear Cache
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            disabled={busy}
+            leftIcon={<IconRefresh size={14} />}
+            onClick={() => setConfirmResetOpen(true)}
+          >
+            Reset Progress
           </Button>
         </div>
       </div>
@@ -311,7 +334,7 @@ export function DataStorageCard() {
               <span className="text-[var(--text-secondary)]">
                 Applied Schema Migration Version
               </span>
-              <span className="font-semibold text-[var(--accent-light)]">
+              <span className="algo-tabular font-semibold text-[var(--accent-light)]">
                 v{dbDetails.schemaVersion}
               </span>
             </div>
@@ -325,7 +348,7 @@ export function DataStorageCard() {
                   <span className="font-mono text-[var(--text-primary)]">
                     {t.tableName}
                   </span>
-                  <span className="font-semibold text-[var(--text-secondary)]">
+                  <span className="algo-tabular font-semibold text-[var(--text-secondary)]">
                     {t.rowCount} rows
                   </span>
                 </div>
@@ -382,6 +405,6 @@ export function DataStorageCard() {
         message="This removes only leftover temporary Java compile/run folders in the application cache directory. Your database, submissions, and progress are never touched."
         confirmLabel="Clear Cache"
       />
-    </section>
+    </SettingCard>
   );
 }

@@ -7,8 +7,13 @@ import {
   IconRotateClockwise,
   IconX,
 } from "@tabler/icons-react";
-import { Badge, Button, Input, Select } from "@/components/ui";
-import { JavaCupEmblem } from "@/components/shared/Illustrations";
+import {
+  Badge,
+  Button,
+  Input,
+  Select,
+  SettingCard,
+} from "@/components/ui";
 import { pickJdkFolder } from "@/lib/tauri/dialogClient";
 import { useJavaRuntimeStore } from "@/stores/javaRuntimeStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -86,143 +91,131 @@ export function JavaRuntimeCard() {
   };
 
   return (
-    <section className="algo-surface p-5 space-y-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent-light)]">
-            <IconCoffee size={18} />
+    <SettingCard
+      id="settings-runtime"
+      icon={<IconCoffee size={18} />}
+      title="Java Runtime"
+      description="Manage local JDK detection, compilation timeout, and JVM heap cap."
+      action={
+        <div className="flex items-center gap-2">
+          {jdkInfo?.detected ? (
+            <Badge tone="success">
+              <span>JDK {jdkInfo.version ?? jdkInfo.majorVersion}</span>
+              <IconCheck size={12} />
+            </Badge>
+          ) : (
+            <Badge tone="warning">
+              <span>Not Detected</span>
+              <IconX size={12} />
+            </Badge>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            loading={checking}
+            leftIcon={<IconRefresh size={14} />}
+            onClick={() => void detectRuntime(settings.customJdkPath)}
+          >
+            Detect
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-1.5">
+        <label
+          htmlFor="settings-jdk-location"
+          className="block text-[13.5px] font-medium text-[var(--text-primary)]"
+        >
+          JDK Location
+        </label>
+        <div className="flex items-center gap-2">
+          <Input
+            id="settings-jdk-location"
+            aria-label="JDK Location"
+            value={pathDraft}
+            onChange={(e) => setPathDraft(e.target.value)}
+            onBlur={() => void handleApplyPath()}
+            placeholder={
+              jdkInfo?.jdkPath ?? "Auto-detect (JAVA_HOME / PATH) or browse..."
+            }
+            containerClassName="flex-1"
+          />
+          <Button
+            variant="secondary"
+            size="md"
+            title="Browse for JDK folder"
+            onClick={() => void handleSelectJdkFolder()}
+            leftIcon={<IconFolderOpen size={15} />}
+          >
+            Browse
+          </Button>
+        </div>
+        {jdkInfo?.warning && (
+          <p className="text-xs text-[var(--status-warning)]">
+            {jdkInfo.warning}
+          </p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-3.5 py-2.5">
+          <span className="text-[13.5px] font-medium text-[var(--text-primary)]">
+            Timeout
           </span>
-          <div>
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">
-              Java Runtime
-            </h2>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Manage local JDK compilation and JVM execution limits.
-            </p>
-          </div>
+          <Select<number>
+            ariaLabel="Execution Timeout"
+            value={settings.executionTimeoutSeconds}
+            onChange={(executionTimeoutSeconds) =>
+              void updateSettings({ executionTimeoutSeconds })
+            }
+            options={[
+              { value: 5, label: "5s" },
+              { value: 15, label: "15s" },
+              { value: 30, label: "30s" },
+              { value: 60, label: "60s" },
+            ]}
+            className="w-24"
+          />
         </div>
 
+        <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-3.5 py-2.5">
+          <span className="text-[13.5px] font-medium text-[var(--text-primary)]">
+            JVM Heap (-Xmx)
+          </span>
+          <Select<number>
+            ariaLabel="JVM Heap Memory Limit"
+            value={settings.memoryLimitMb}
+            onChange={(memoryLimitMb) =>
+              void updateSettings({ memoryLimitMb })
+            }
+            options={[
+              { value: 128, label: "128 MB" },
+              { value: 256, label: "256 MB" },
+              { value: 512, label: "512 MB" },
+              { value: 1024, label: "1024 MB" },
+            ]}
+            className="w-28"
+          />
+        </div>
+      </div>
+
+      <p className="rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs leading-relaxed text-[var(--text-muted)]">
+        Note: <code className="font-mono text-[var(--text-secondary)]">-Xmx</code>{" "}
+        caps Java object heap allocation only; total OS process memory (JVM
+        metaspace, thread stacks, native libraries) is higher and not strictly
+        sandboxed by Windows.
+      </p>
+
+      <div className="flex justify-end pt-1">
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
-          loading={checking}
-          leftIcon={<IconRefresh size={14} />}
-          onClick={() => void detectRuntime(settings.customJdkPath)}
+          leftIcon={<IconRotateClockwise size={14} />}
+          onClick={() => void handleReset()}
         >
-          Detect
+          Reset to Default
         </Button>
       </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-12 items-center">
-        <div className="sm:col-span-4 flex flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-input)] py-4 px-2">
-          <JavaCupEmblem className="w-16 h-16" />
-          <span className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-            Java
-          </span>
-        </div>
-
-        <div className="sm:col-span-8 space-y-3 text-xs">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[var(--text-secondary)]">Java Version</span>
-            {jdkInfo?.detected ? (
-              <Badge tone="success">
-                <span>JDK {jdkInfo.version ?? jdkInfo.majorVersion}</span>
-                <IconCheck size={12} />
-              </Badge>
-            ) : (
-              <Badge tone="warning">
-                <span>Not Detected</span>
-                <IconX size={12} />
-              </Badge>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-[var(--text-secondary)]">JDK Location</span>
-            <div className="flex items-center gap-1.5">
-              <Input
-                aria-label="JDK Location"
-                value={pathDraft}
-                onChange={(e) => setPathDraft(e.target.value)}
-                onBlur={() => void handleApplyPath()}
-                placeholder={
-                  jdkInfo?.jdkPath ?? "Auto-detect (JAVA_HOME / PATH) or browse..."
-                }
-                containerClassName="flex-1"
-              />
-              <Button
-                variant="secondary"
-                size="sm"
-                title="Browse for JDK folder"
-                onClick={() => void handleSelectJdkFolder()}
-                leftIcon={<IconFolderOpen size={14} />}
-              >
-                Browse
-              </Button>
-            </div>
-            {jdkInfo?.warning && (
-              <p className="text-[11px] text-[var(--status-warning)]">
-                {jdkInfo.warning}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--text-secondary)]">Timeout</span>
-              <Select<number>
-                ariaLabel="Execution Timeout"
-                value={settings.executionTimeoutSeconds}
-                onChange={(executionTimeoutSeconds) =>
-                  void updateSettings({ executionTimeoutSeconds })
-                }
-                options={[
-                  { value: 5, label: "5s" },
-                  { value: 15, label: "15s" },
-                  { value: 30, label: "30s" },
-                  { value: 60, label: "60s" },
-                ]}
-                className="w-20"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--text-secondary)]">JVM Heap (-Xmx)</span>
-              <Select<number>
-                ariaLabel="JVM Heap Memory Limit"
-                value={settings.memoryLimitMb}
-                onChange={(memoryLimitMb) =>
-                  void updateSettings({ memoryLimitMb })
-                }
-                options={[
-                  { value: 128, label: "128 MB" },
-                  { value: 256, label: "256 MB" },
-                  { value: 512, label: "512 MB" },
-                  { value: 1024, label: "1024 MB" },
-                ]}
-                className="w-26"
-              />
-            </div>
-          </div>
-
-          <p className="text-[11px] text-[var(--text-muted)]">
-            Note: <code>-Xmx</code> caps Java object heap allocation only; total OS
-            process memory (JVM metaspace, thread stacks, native libraries) is higher
-            and not strictly sandboxed by Windows.
-          </p>
-
-          <div>
-            <Button
-              variant="secondary"
-              size="sm"
-              leftIcon={<IconRotateClockwise size={14} />}
-              onClick={() => void handleReset()}
-            >
-              Reset to Default
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
+    </SettingCard>
   );
 }

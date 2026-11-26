@@ -1,5 +1,5 @@
-import { IconChecklist, IconTrophy } from "@tabler/icons-react";
-import { Switch } from "@/components/ui";
+import { IconTrophy } from "@tabler/icons-react";
+import { SettingCard, SettingRow, Switch } from "@/components/ui";
 import { useSettingsStore } from "@/stores/settingsStore";
 import type { AppSettings } from "@/types/models";
 
@@ -14,13 +14,38 @@ const PRACTICE_TOGGLES: Array<{
     | "showSolvedProblems"
   >;
   label: string;
+  description: string;
 }> = [
-  { key: "autoOpenNextProblem", label: "Automatically open next problem" },
-  { key: "showHintsByDefault", label: "Show hints by default" },
-  { key: "showTestResultsAutomatically", label: "Show test results automatically" },
-  { key: "confirmBeforeResettingCode", label: "Confirm before resetting code" },
-  { key: "rememberLastCategory", label: "Remember last opened category" },
-  { key: "showSolvedProblems", label: "Show solved problems" },
+  {
+    key: "autoOpenNextProblem",
+    label: "Automatically open next problem",
+    description: "Advance to the next challenge in the category after passing all tests.",
+  },
+  {
+    key: "showHintsByDefault",
+    label: "Show hints by default",
+    description: "Expand problem hints automatically when opening a challenge.",
+  },
+  {
+    key: "showTestResultsAutomatically",
+    label: "Show test results automatically",
+    description: "Open the execution output panel whenever you Run or Submit code.",
+  },
+  {
+    key: "confirmBeforeResettingCode",
+    label: "Confirm before resetting code",
+    description: "Show a safety dialog before reverting your code to the starter template.",
+  },
+  {
+    key: "rememberLastCategory",
+    label: "Remember last opened category",
+    description: "Re-open your previous category filter when returning to Problems.",
+  },
+  {
+    key: "showSolvedProblems",
+    label: "Show solved problems",
+    description: "Keep already completed problems visible in the main problem catalog.",
+  },
 ];
 
 export function PracticePreferencesCard() {
@@ -28,41 +53,37 @@ export function PracticePreferencesCard() {
   const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   return (
-    <section className="algo-surface p-5 space-y-4">
-      <div className="flex items-start gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--status-warning-soft)] text-[var(--status-warning)]">
-          <IconTrophy size={18} />
-        </span>
-        <div>
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Practice Preferences
-          </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Configure your problem solving workflow.
-          </p>
-        </div>
+    <SettingCard
+      id="settings-practice"
+      icon={<IconTrophy size={18} />}
+      iconClassName="bg-[var(--status-warning-soft)] border-[var(--status-warning-border)] text-[var(--status-warning)]"
+      title="Practice Preferences"
+      description="Fine-tune your problem solving flow and editor feedback."
+    >
+      <div className="divide-y divide-[var(--border-subtle)]">
+        {PRACTICE_TOGGLES.map((item, index) => (
+          <SettingRow
+            key={item.key}
+            label={item.label}
+            description={item.description}
+            className={
+              index === 0
+                ? "pb-3.5"
+                : index === PRACTICE_TOGGLES.length - 1
+                ? "pt-3.5"
+                : "py-3.5"
+            }
+          >
+            <Switch
+              ariaLabel={item.label}
+              checked={settings[item.key]}
+              onCheckedChange={(val) =>
+                void updateSettings({ [item.key]: val })
+              }
+            />
+          </SettingRow>
+        ))}
       </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-12 items-center">
-        <div className="sm:col-span-4 hidden sm:flex flex-col items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-input)] py-7 text-[var(--accent-light)]">
-          <IconChecklist size={52} stroke={1.4} />
-        </div>
-
-        <div className="sm:col-span-8 space-y-2.5 text-xs">
-          {PRACTICE_TOGGLES.map((item) => (
-            <div key={item.key} className="flex items-center justify-between gap-3">
-              <span className="text-[var(--text-primary)]">{item.label}</span>
-              <Switch
-                ariaLabel={item.label}
-                checked={settings[item.key]}
-                onCheckedChange={(val) =>
-                  void updateSettings({ [item.key]: val })
-                }
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    </SettingCard>
   );
 }

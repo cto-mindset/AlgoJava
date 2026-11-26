@@ -6,7 +6,7 @@ import {
   IconInfoCircle,
   IconRefresh,
 } from "@tabler/icons-react";
-import { Button, Dialog } from "@/components/ui";
+import { Button, Dialog, SettingCard } from "@/components/ui";
 import { getAppBuildInfo } from "@/lib/tauri/storageClient";
 import { checkForUpdatesSafely } from "@/lib/tauri/updaterClient";
 import { useJavaRuntimeStore } from "@/stores/javaRuntimeStore";
@@ -51,89 +51,87 @@ export function AboutSummaryCard() {
   };
 
   return (
-    <section className="algo-surface p-5 space-y-4">
-      <div className="flex items-start gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent-light)]">
-          <IconInfoCircle size={18} />
-        </span>
-        <div>
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            About AlgoJava
-          </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Version information, runtime status, and credits.
-          </p>
+    <SettingCard
+      id="settings-about"
+      icon={<IconInfoCircle size={18} />}
+      title="About AlgoJava"
+      description="Version details, detected Java runtime, and open-source notices."
+      action={
+        <Button
+          variant="primary"
+          size="sm"
+          loading={checkingUpdate}
+          leftIcon={<IconRefresh size={14} />}
+          onClick={() => void handleCheckUpdates()}
+        >
+          Check for Updates
+        </Button>
+      }
+    >
+      {/* Brand + 3-cell metadata bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent-light)]">
+            <IconCode size={20} />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-[var(--text-primary)]">
+              Algo<span className="text-[var(--accent-light)]">Java</span>
+            </div>
+            <div className="text-xs text-[var(--text-muted)]">
+              Offline Desktop Edition
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 sm:gap-5 text-xs">
+          <div>
+            <div className="text-[var(--text-muted)]">Version</div>
+            <div className="algo-tabular mt-0.5 font-semibold text-[var(--text-primary)]">
+              {buildInfo?.appVersion ?? "0.1.0"}
+            </div>
+          </div>
+          <div>
+            <div className="text-[var(--text-muted)]">Build</div>
+            <div className="algo-tabular mt-0.5 font-semibold text-[var(--text-primary)]">
+              {buildInfo ? buildInfo.buildDate : "2026.11.25"}
+            </div>
+          </div>
+          <div>
+            <div className="text-[var(--text-muted)]">Runtime</div>
+            <div className="algo-tabular mt-0.5 font-semibold text-[var(--text-primary)]">
+              {jdkInfo?.detected ? jdkInfo.version ?? "Detected" : "Not Detected"}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-12 items-center text-xs">
-        <div className="sm:col-span-3 flex flex-col items-center justify-center gap-1.5 py-2">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent-light)]">
-            <IconCode size={22} />
-          </div>
-          <span className="text-sm font-bold text-[var(--text-primary)]">
-            Algo<span className="text-[var(--accent-light)]">Java</span>
-          </span>
-        </div>
-
-        <div className="sm:col-span-5 space-y-1.5">
-          <div className="flex justify-between gap-2">
-            <span className="text-[var(--text-secondary)]">Version:</span>
-            <span className="font-semibold text-[var(--text-primary)]">
-              {buildInfo?.appVersion ?? "0.1.0"}
-            </span>
-          </div>
-          <div className="flex justify-between gap-2">
-            <span className="text-[var(--text-secondary)]">Build:</span>
-            <span className="font-semibold text-[var(--text-primary)]">
-              {buildInfo ? `${buildInfo.buildDate} (${buildInfo.buildProfile})` : "2026.11.25"}
-            </span>
-          </div>
-          <div className="flex justify-between gap-2">
-            <span className="text-[var(--text-secondary)]">Java Runtime:</span>
-            <span className="font-semibold text-[var(--text-primary)]">
-              {jdkInfo?.detected ? jdkInfo.version ?? "Detected" : "Not Detected"}
-            </span>
-          </div>
-          <div className="pt-2">
-            <Button
-              variant="primary"
-              size="sm"
-              loading={checkingUpdate}
-              leftIcon={<IconRefresh size={14} />}
-              onClick={() => void handleCheckUpdates()}
-            >
-              Check for Updates
-            </Button>
-          </div>
-        </div>
-
-        <div className="sm:col-span-4 space-y-2 sm:pl-4 sm:border-l sm:border-[var(--border-subtle)]">
-          <button
-            type="button"
-            onClick={() => setLicenseOpen(true)}
-            className="flex w-full items-center justify-between text-[var(--accent-light)] hover:underline cursor-pointer"
-          >
-            <span>License</span>
-            <IconExternalLink size={13} />
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/about")}
-            className="flex w-full items-center justify-between text-[var(--accent-light)] hover:underline cursor-pointer"
-          >
-            <span>Open Source Libraries</span>
-            <IconExternalLink size={13} />
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/about")}
-            className="flex w-full items-center justify-between text-[var(--accent-light)] hover:underline cursor-pointer"
-          >
-            <span>Credits</span>
-            <IconExternalLink size={13} />
-          </button>
-        </div>
+      {/* Links bar */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <button
+          type="button"
+          onClick={() => setLicenseOpen(true)}
+          className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs font-medium text-[var(--accent-light)] hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+        >
+          <span>License</span>
+          <IconExternalLink size={13} />
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/about")}
+          className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs font-medium text-[var(--accent-light)] hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+        >
+          <span>Open Source Libraries</span>
+          <IconExternalLink size={13} />
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/about")}
+          className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-input)] px-3.5 py-2.5 text-xs font-medium text-[var(--accent-light)] hover:border-[var(--accent-border)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+        >
+          <span>Credits</span>
+          <IconExternalLink size={13} />
+        </button>
       </div>
 
       <Dialog
@@ -141,7 +139,7 @@ export function AboutSummaryCard() {
         onClose={() => setLicenseOpen(false)}
         title="Project License Notice"
       >
-        <div className="space-y-2 text-xs leading-relaxed text-[var(--text-secondary)]">
+        <div className="space-y-2.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
           <p>
             No standalone LICENSE file was shipped in this repository yet. The
             AlgoJava desktop shell and source code are proprietary/private to the
@@ -154,6 +152,6 @@ export function AboutSummaryCard() {
           </p>
         </div>
       </Dialog>
-    </section>
+    </SettingCard>
   );
 }

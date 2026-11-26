@@ -4,10 +4,17 @@ import {
   IconPalette,
   IconSun,
 } from "@tabler/icons-react";
-import { Input, SegmentedControl, Switch } from "@/components/ui";
+import {
+  Input,
+  SegmentedControl,
+  Select,
+  SettingCard,
+  SettingRow,
+  Switch,
+} from "@/components/ui";
 import { cn } from "@/lib/utils/cn";
 import { useSettingsStore } from "@/stores/settingsStore";
-import type { AccentColor, FontScale, ThemeMode } from "@/types/models";
+import type { AccentColor, FontScale, ThemeMode, UiFontFamily } from "@/types/models";
 
 const ACCENT_OPTIONS: Array<{ value: AccentColor; label: string; hex: string }> = [
   { value: "violet", label: "Violet", hex: "#7c3aed" },
@@ -17,152 +24,155 @@ const ACCENT_OPTIONS: Array<{ value: AccentColor; label: string; hex: string }> 
   { value: "amber", label: "Amber", hex: "#d97706" },
 ];
 
+const FONT_LABELS: Record<UiFontFamily, string> = {
+  outfit: "Outfit",
+  jost: "Jost",
+  inter: "Inter",
+};
+
 export function AppearanceCard() {
   const settings = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   return (
-    <section className="algo-surface p-5 space-y-4">
-      <div className="flex items-start gap-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent-light)]">
-          <IconPalette size={18} />
+    <SettingCard
+      id="settings-appearance"
+      icon={<IconPalette size={18} />}
+      title="Appearance"
+      description="Personalize theme, violet accent, typography, and shell behavior."
+    >
+      {/* Compact live preview strip */}
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] px-3.5 py-2.5">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-rose-400/90" />
+            <span className="h-2 w-2 rounded-full bg-amber-400/90" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400/90" />
+          </div>
+          <div className="h-4 w-px bg-[var(--border-subtle)]" />
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className="h-2.5 w-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: "var(--accent-primary)" }}
+            />
+            <span className="truncate text-xs font-medium text-[var(--text-primary)]">
+              {settings.userName || "Developer"} · {FONT_LABELS[settings.fontFamily]}
+            </span>
+          </div>
+        </div>
+        <span className="shrink-0 rounded-full border border-[var(--accent-border)] bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--accent-light)] capitalize">
+          {settings.theme} · {settings.fontSize.toUpperCase()}
         </span>
-        <div>
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Appearance
-          </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Customize the look and feel of the app.
-          </p>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-12 items-start">
-        {/* Mini visual preview card matching Settings reference */}
-        <div className="sm:col-span-5 space-y-3">
-          <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-input)] p-3 space-y-2.5">
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-rose-400" />
-              <span className="h-2 w-2 rounded-full bg-amber-400" />
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            </div>
-            <div className="grid grid-cols-12 gap-2">
-              <div className="col-span-4 space-y-1.5">
-                <div className="h-2 w-full rounded bg-[var(--accent-primary)]/70" />
-                <div className="h-2 w-4/5 rounded bg-[var(--track-bg)]" />
-                <div className="h-2 w-3/5 rounded bg-[var(--track-bg)]" />
-              </div>
-              <div className="col-span-8 space-y-1.5 rounded bg-[var(--bg-surface)] p-2 border border-[var(--border-subtle)]">
-                <div className="h-2 w-3/4 rounded bg-[var(--accent-light)]/50" />
-                <div className="h-2 w-full rounded bg-[var(--track-bg)]" />
-                <div className="h-2 w-2/3 rounded bg-[var(--track-bg)]" />
-              </div>
-            </div>
-          </div>
+      <div className="divide-y divide-[var(--border-subtle)]">
+        <SettingRow label="Display Name" htmlFor="settings-display-name" className="pb-3.5">
+          <Input
+            id="settings-display-name"
+            value={settings.userName}
+            maxLength={32}
+            placeholder="Developer"
+            containerClassName="w-full sm:w-48"
+            onChange={(e) => void updateSettings({ userName: e.target.value })}
+          />
+        </SettingRow>
 
-          <div className="space-y-1">
-            <label
-              htmlFor="settings-display-name"
-              className="text-xs font-medium text-[var(--text-secondary)]"
-            >
-              Display Name
-            </label>
-            <Input
-              id="settings-display-name"
-              value={settings.userName}
-              maxLength={32}
-              placeholder="Developer"
-              onChange={(e) => void updateSettings({ userName: e.target.value })}
-            />
-          </div>
-        </div>
+        <SettingRow label="Theme" className="py-3.5">
+          <SegmentedControl<ThemeMode>
+            value={settings.theme}
+            onChange={(theme) => void updateSettings({ theme })}
+            options={[
+              { value: "dark", label: "Dark", icon: <IconMoon size={13} /> },
+              { value: "light", label: "Light", icon: <IconSun size={13} /> },
+              {
+                value: "system",
+                label: "System",
+                icon: <IconDeviceDesktop size={13} />,
+              },
+            ]}
+          />
+        </SettingRow>
 
-        {/* Controls */}
-        <div className="sm:col-span-7 space-y-3.5 text-xs">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-medium text-[var(--text-primary)]">Theme</span>
-            <SegmentedControl<ThemeMode>
-              value={settings.theme}
-              onChange={(theme) => void updateSettings({ theme })}
-              options={[
-                { value: "dark", label: "Dark", icon: <IconMoon size={13} /> },
-                { value: "light", label: "Light", icon: <IconSun size={13} /> },
-                {
-                  value: "system",
-                  label: "System",
-                  icon: <IconDeviceDesktop size={13} />,
-                },
-              ]}
-            />
+        <SettingRow label="Accent Color" className="py-3.5">
+          <div className="flex items-center gap-2.5">
+            {ACCENT_OPTIONS.map((opt) => {
+              const active = settings.accentColor === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  aria-label={`Accent color ${opt.label}`}
+                  title={opt.label}
+                  onClick={() => void updateSettings({ accentColor: opt.value })}
+                  className={cn(
+                    "h-6 w-6 rounded-full transition-transform cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-light)]",
+                    active
+                      ? "ring-2 ring-[var(--text-primary)] ring-offset-2 ring-offset-[var(--bg-surface)] scale-110"
+                      : "opacity-80 hover:opacity-100 hover:scale-105"
+                  )}
+                  style={{ backgroundColor: opt.hex }}
+                />
+              );
+            })}
           </div>
+        </SettingRow>
 
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-medium text-[var(--text-primary)]">
-              Accent Color
-            </span>
-            <div className="flex items-center gap-2">
-              {ACCENT_OPTIONS.map((opt) => {
-                const active = settings.accentColor === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    aria-label={`Accent color ${opt.label}`}
-                    title={opt.label}
-                    onClick={() => void updateSettings({ accentColor: opt.value })}
-                    className={cn(
-                      "h-6 w-6 rounded-full transition-transform cursor-pointer",
-                      active
-                        ? "ring-2 ring-white ring-offset-2 ring-offset-[var(--bg-surface)] scale-110"
-                        : "opacity-85 hover:opacity-100"
-                    )}
-                    style={{ backgroundColor: opt.hex }}
-                  />
-                );
-              })}
-            </div>
-          </div>
+        <SettingRow
+          label="Font Family"
+          description="Primary typeface for headings and problem statements."
+          className="py-3.5"
+        >
+          <Select<UiFontFamily>
+            ariaLabel="UI Font Family"
+            value={settings.fontFamily}
+            onChange={(fontFamily) => void updateSettings({ fontFamily })}
+            options={[
+              { value: "outfit", label: "Outfit" },
+              { value: "jost", label: "Jost" },
+              { value: "inter", label: "Inter" },
+            ]}
+            className="w-40"
+          />
+        </SettingRow>
 
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-medium text-[var(--text-primary)]">
-              Font Size
-            </span>
-            <SegmentedControl<FontScale>
-              value={settings.fontSize}
-              onChange={(fontSize) => void updateSettings({ fontSize })}
-              options={[
-                { value: "sm", label: "S" },
-                { value: "md", label: "M" },
-                { value: "lg", label: "L" },
-              ]}
-            />
-          </div>
+        <SettingRow label="Font Size" className="py-3.5">
+          <SegmentedControl<FontScale>
+            value={settings.fontSize}
+            onChange={(fontSize) => void updateSettings({ fontSize })}
+            options={[
+              { value: "sm", label: "S" },
+              { value: "md", label: "M" },
+              { value: "lg", label: "L" },
+            ]}
+          />
+        </SettingRow>
 
-          <div className="flex items-center justify-between pt-0.5">
-            <span className="font-medium text-[var(--text-primary)]">
-              Sidebar Collapsed
-            </span>
-            <Switch
-              ariaLabel="Sidebar Collapsed"
-              checked={settings.sidebarCollapsed}
-              onCheckedChange={(sidebarCollapsed) =>
-                void updateSettings({ sidebarCollapsed })
-              }
-            />
-          </div>
+        <SettingRow
+          label="Sidebar Collapsed"
+          description="Keep the left navigation rail compact for extra editor width."
+          className="py-3.5"
+        >
+          <Switch
+            ariaLabel="Sidebar Collapsed"
+            checked={settings.sidebarCollapsed}
+            onCheckedChange={(sidebarCollapsed) =>
+              void updateSettings({ sidebarCollapsed })
+            }
+          />
+        </SettingRow>
 
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-[var(--text-primary)]">
-              Animations
-            </span>
-            <Switch
-              ariaLabel="Animations"
-              checked={settings.animations}
-              onCheckedChange={(animations) => void updateSettings({ animations })}
-            />
-          </div>
-        </div>
+        <SettingRow
+          label="Animations"
+          description="Smooth transitions for dialogs, tabs, and progress bars."
+          className="pt-3.5"
+        >
+          <Switch
+            ariaLabel="Animations"
+            checked={settings.animations}
+            onCheckedChange={(animations) => void updateSettings({ animations })}
+          />
+        </SettingRow>
       </div>
-    </section>
+    </SettingCard>
   );
 }
