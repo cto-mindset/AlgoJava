@@ -79,12 +79,22 @@ export function sanitizeUpdaterError(err: unknown): SanitizedUpdaterError {
     raw.includes("signed version") ||
     raw.includes("signedversion") ||
     raw.includes("verification") ||
-    raw.includes("decode")
+    raw.includes("decode") ||
+    raw.includes("tls") ||
+    raw.includes("certificate") ||
+    raw.includes("ssl")
   ) {
     if (raw.includes("empty")) {
       return {
         kind: "not_configured",
         message: "Automatic updates are not configured in this build.",
+      };
+    }
+    if (raw.includes("tls") || raw.includes("certificate") || raw.includes("ssl")) {
+      return {
+        kind: "signature",
+        message:
+          "Secure HTTPS connection verification failed. Update was blocked for your security.",
       };
     }
     return {
@@ -113,9 +123,7 @@ export function sanitizeUpdaterError(err: unknown): SanitizedUpdaterError {
     raw.includes("timed out") ||
     raw.includes("connect") ||
     raw.includes("reqwest") ||
-    raw.includes("lookup") ||
-    raw.includes("tls") ||
-    raw.includes("certificate")
+    raw.includes("lookup")
   ) {
     return {
       kind: "offline",

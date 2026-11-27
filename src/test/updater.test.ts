@@ -185,5 +185,57 @@ describe("Updater store & safety guarantees", () => {
     );
     expect(netSanitized.kind).toBe("offline");
     expect(netSanitized.message).not.toContain("internal.host");
+
+    const tlsSanitized = sanitizeUpdaterError(
+      new Error("TLS certificate verify failed")
+    );
+    expect(tlsSanitized.kind).toBe("signature");
+    expect(tlsSanitized.message).toContain("HTTPS");
+  });
+
+  it("handles download errors cleanly and allows retry without locking the store", async () => {
+    mockCheckForAppUpdate.mockResolvedValue({
+      status: "available",
+      message: "Update available",
+      update: {
+        version: "1.2.0",
+        currentVersion: "1.0.0-alpha.1",
+        notes: "Retry test",
+      },
+    });
+    mockDownloadAndInstall
+      .mockRejectedValueOnce(new Error("The update download could not complete."))
+      .mockResolvedValueOnce(undefined);
+
+    await useUpdaterStore.getState().checkManually();
+    useUpdaterStore.getState().openInstallConfirmation();
+    await useUpdaterStore.getState().confirmDownloadAndInstall();
+
+    expect(useUpdaterStore.getState().status).toBe("error");
+    expect(useUpdaterStore.getState().errorKind).toBe("download");
+
+    // Re-checking recovers cleanly
+    await useUpdaterStore.getState().checkManually();
+    expect(useUpdaterStore.getState().status).toBe("available");
+    expect(useUpdaterStore.getState().errorMessage).toBeNull();
+  });
+
+  it("preserves legacy user settings during upgrade hydration without new updater fields", async () => {
+    localStorage.setItem(
+      "algojava.settings",
+      JSON.stringify({
+        userName: "Dylan",
+        theme: "light",
+        editorFontSize: 16,
+      })
+    );
+
+    await useSettingsStore.getState().hydrateSettings();
+    const hydrated = useSettingsStore.getState().settings;
+    expect(hydrated.userName).toBe("Dylan");
+    expect(hydrated.theme).toBe("light");
+    expect(hydrated.editorFontSize).toBe(16);
+    expect(hydrated.lastUpdateCheckAt).toBeNull();
+    expect(hydrated.dismissedUpdateVersion).toBeNull();
   });
 });

@@ -84,5 +84,8 @@ Triggered only when pushing SemVer tags matching `v*`:
 
 - **Stable update endpoint** (configured in `src-tauri/tauri.conf.json`):
   `https://github.com/cto-mindset/algojava-releases/releases/latest/download/latest.json`
-- **Preview channel separation**:
-  Alpha (`v1.0.0-alpha.N`) and Beta (`v1.0.0-beta.N`) tags generate `latest-preview.json` and mark the GitHub Release `--prerelease --latest=false`. As a result, stable installations querying `/releases/latest/download/latest.json` never receive alpha or beta upgrades automatically. Future preview-track builds can opt into `latest-preview.json` by targeting a dedicated preview endpoint without changing stable releases.
+- **Preview channel separation (current vs future behavior)**:
+  Alpha (`v1.0.0-alpha.N`) and Beta (`v1.0.0-beta.N`) tags generate a per-tag `latest-preview.json` artifact and publish with `--prerelease --latest=false`. Therefore:
+  1. Stable installations querying `/releases/latest/download/latest.json` **never** receive alpha or beta updates.
+  2. Alpha/beta builds also currently point only to `/releases/latest/download/latest.json` (so they can upgrade to the next **stable** release once `>= 1.0.0`, without auto-updating to another prerelease automatically).
+  3. **Future preview auto-update delivery**: when rolling preview auto-updates are desired, preview builds can either target a dedicated floating `preview` release asset (`https://github.com/cto-mindset/algojava-releases/releases/download/preview/latest-preview.json`) or a GitHub Pages static channel manifest updated during `--prerelease` publishes — without changing the stable `latest.json` contract.

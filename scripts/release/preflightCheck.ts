@@ -108,18 +108,15 @@ function main() {
 
     const expectedStableEndpoint = `https://github.com/${expectedOwner}/${expectedRepo}/releases/latest/download/latest.json`;
     const endpoints = updater.endpoints ?? [];
-    if (endpoints.length === 0) {
-      errors.push("tauri.conf.json: plugins.updater.endpoints must not be empty.");
+    if (endpoints.length !== 1 || endpoints[0] !== expectedStableEndpoint) {
+      errors.push(
+        `tauri.conf.json: plugins.updater.endpoints must contain only the single stable endpoint ${expectedStableEndpoint}`
+      );
     }
     for (const url of endpoints) {
       if (!url.startsWith("https://")) {
         errors.push(`Updater endpoint must use HTTPS: ${url}`);
       }
-    }
-    if (!endpoints.includes(expectedStableEndpoint)) {
-      errors.push(
-        `tauri.conf.json: plugins.updater.endpoints must include ${expectedStableEndpoint}`
-      );
     }
 
     const pubkey = updater.pubkey ?? "";

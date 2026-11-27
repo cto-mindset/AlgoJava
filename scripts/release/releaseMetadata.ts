@@ -3,9 +3,18 @@ export type ReleaseChannel = "stable" | "alpha" | "beta" | "prerelease";
 export interface ParsedReleaseTag {
   tag: string;
   version: string;
+  major: number;
+  minor: number;
+  patch: number;
   channel: ReleaseChannel;
   isPrerelease: boolean;
   manifestFileName: "latest.json" | "latest-preview.json";
+}
+
+export interface DecodedMinisignComment {
+  file?: string;
+  version?: string;
+  trustedComment: string;
 }
 
 export interface UpdaterPlatformEntry {
@@ -29,7 +38,7 @@ export interface VersionAlignmentInput {
 }
 
 const SEMVER_RE =
-  /^v((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)$/;
+  /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 
 const MSI_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?$/;
 
@@ -46,12 +55,18 @@ export function parseReleaseTag(rawTag: string): ParsedReleaseTag {
     );
   }
 
-  const version = match[1];
-  const prerelease = match[2];
+  const version = tag.slice(1);
+  const major = Number(match[1]);
+  const minor = Number(match[2]);
+  const patch = Number(match[3]);
+  const prerelease = match[4];
   if (!prerelease) {
     return {
       tag,
       version,
+      major,
+      minor,
+      patch,
       channel: "stable",
       isPrerelease: false,
       manifestFileName: "latest.json",
@@ -68,6 +83,9 @@ export function parseReleaseTag(rawTag: string): ParsedReleaseTag {
   return {
     tag,
     version,
+    major,
+    minor,
+    patch,
     channel,
     isPrerelease: true,
     manifestFileName: "latest-preview.json",
@@ -137,10 +155,61 @@ export function validateVersionAlignment(
   }
 
   if (input.msiVersion) {
-    errors.push(...validateMsiVersion(input.msiVersion));
+    const msiErrors = validateMsiVersion(input.msiVersion);
+    errors.push(...msiErrors);
+    if (msiErrors.length === 0) {
+      const m = MSI_VERSION_RE.exec(input.msiVersion.trim());
+      if (m) {
+        const mMajor = Number(m[1]);
+        const mMinor = Number(m[2]);
+        const mPatch = Number(m[3]);
+        const mBuild = m[4] !== undefined ? Number(m[4]) : undefined;
+        if (
+          mMajor !== parsed.major ||
+          mMinor !== parsed.minor ||
+          mPatch !== parsed.patch
+        ) {
+          errors.push(
+            `bundle.windows.wix.version (${input.msiVersion}) base major.minor.patch must match tag version (${parsed.major}.${parsed.minor}.${parsed.patch}).`
+          );
+        }
+        if (!parsed.isPrerelease && mBuild !== undefined && mBuild !== 0) {
+          errors.push(
+            `Stable release tag (${parsed.tag}) must not use non-zero MSI 4th build field (${input.msiVersion}).`
+          );
+        }
+      }
+    }
   }
 
   return errors;
+}
+
+/**
+ * Decodes Tauri's base64-wrapped minisign signature and extracts trusted comment
+ * key/value pairs (`timestamp`, `file`, `version`).
+ */
+export function parseMinisignTrustedComment(
+  sigBase64: string
+): DecodedMinisignComment {
+  const decoded = atob(sigBase64.trim());
+  const lines = decoded.trim().split(/\r?\n/);
+  if (lines.length < 3 || !lines[2].startsWith("trusted comment:")) {
+    throw new Error("Invalid minisign signature structure (missing trusted comment).");
+  }
+
+  const trustedComment = lines[2].slice("trusted comment:".length).trim();
+  const fields = trustedComment.split("\t");
+  let file: string | undefined;
+  let version: string | undefined;
+  for (const field of fields) {
+    if (field.startsWith("file:")) {
+      file = field.slice("file:".length);
+    } else if (field.startsWith("version:")) {
+      version = field.slice("version:".length);
+    }
+  }
+  return { file, version, trustedComment };
 }
 
 /**
@@ -242,7 +311,7 @@ export function validateUpdaterManifest(
       errors.push(`Missing required platform entry "${target}".`);
       continue;
     }
-    if (!entry.url.startsWith(expectedPrefix)) {
+  if (!entry.url.startsWith(expectedPrefix)) {
       errors.push(
         `Platform "${target}" URL must start with "${expectedPrefix}" (got "${entry.url}").`
       );
@@ -250,6 +319,19 @@ export function validateUpdaterManifest(
     if (!entry.signature || entry.signature.trim().length < 32) {
       errors.push(`Platform "${target}" signature is missing or too short.`);
     }
+  }
+
+  const nsisUrl = manifest.platforms["windows-x86_64-nsis"]?.url;
+  const msiUrl = manifest.platforms["windows-x86_64-msi"]?.url;
+  const fallbackUrl = manifest.platforms["windows-x86_64"]?.url;
+  if (nsisUrl && !nsisUrl.endsWith("-setup.exe")) {
+    errors.push(`windows-x86_64-nsis URL must point to a -setup.exe asset (${nsisUrl}).`);
+  }
+  if (msiUrl && !msiUrl.endsWith(".msi")) {
+    errors.push(`windows-x86_64-msi URL must point to an .msi asset (${msiUrl}).`);
+  }
+  if (nsisUrl && fallbackUrl && nsisUrl !== fallbackUrl) {
+    errors.push("windows-x86_64 fallback URL must match windows-x86_64-nsis URL.");
   }
 
   return errors;

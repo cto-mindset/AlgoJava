@@ -33,11 +33,13 @@ AlgoJava strictly follows **SemVer** across all project manifests while maintain
 
 | Channel | Tag Format | SemVer (`package.json`, `Cargo.toml`, `tauri.conf.json`) | Windows MSI (`bundle.windows.wix.version`) | Manifest Uploaded | Updates Stable `latest.json`? |
 |---|---|---|---|---|---|
-| **Alpha** | `v1.0.0-alpha.N` | `1.0.0-alpha.N` | `1.0.0.N` (numeric `<= 65535`) | `latest-preview.json` | **No** (`--prerelease --latest=false`) |
-| **Beta** | `v1.0.0-beta.N` | `1.0.0-beta.N` | `1.0.0.N` | `latest-preview.json` | **No** (`--prerelease --latest=false`) |
-| **Stable** | `v1.0.0` | `1.0.0` | `1.0.0` (or remove override / match numeric) | `latest.json` | **Yes** (`--latest`) |
+| **Alpha** | `v1.0.0-alpha.N` | `1.0.0-alpha.N` | `1.0.0.N` (numeric `<= 65535`) | `latest-preview.json` *(per-tag artifact only)* | **No** (`--prerelease --latest=false`) |
+| **Beta** | `v1.0.0-beta.N` | `1.0.0-beta.N` | `1.0.0.N` | `latest-preview.json` *(per-tag artifact only)* | **No** (`--prerelease --latest=false`) |
+| **Stable** | `v1.0.0` | `1.0.0` | `1.0.0` (or `1.0.0.0` / omit override) | `latest.json` | **Yes** (`--latest`) |
 
-> **Why `bundle.windows.wix.version` exists:** Windows Installer (`.msi`) rejects non-numeric prerelease segments such as `-alpha.1`. Keeping `"wix": { "version": "1.0.0.1" }` lets MSI packaging succeed without stripping `-alpha.1` or `-beta.1` from AlgoJava's application version or updater metadata.
+> **Why `bundle.windows.wix.version` exists:** Windows Installer (`.msi`) rejects non-numeric prerelease segments such as `-alpha.1`. Keeping `"wix": { "version": "1.0.0.1" }` lets MSI packaging succeed without stripping `-alpha.1` or `-beta.1` from AlgoJava's application version or updater metadata. Notice its `major.minor.patch` must match the SemVer tag (`1.0.0`), and for Windows MSI major upgrades within prereleases, increment the 4th numeric field (note Windows Installer considers only the first 3 fields `major.minor.patch` for in-place upgrade detection when reusing the same `UpgradeCode`).
+
+> **Preview auto-update status:** All desktop builds currently configure **only** the stable endpoint `https://github.com/cto-mindset/algojava-releases/releases/latest/download/latest.json`. Alpha and beta releases publish `latest-preview.json` on the individual prerelease tag only so they never pollute `latest.json`; automatic rolling preview updates are not active until a dedicated floating preview endpoint (e.g. a floating `preview` release tag or separate manifest host) is introduced later.
 
 **Keep these files aligned before tagging:**
 1. `package.json` → `"version"`
@@ -71,15 +73,16 @@ AlgoJava strictly follows **SemVer** across all project manifests while maintain
    git push origin main
    ```
 
-4. **Create an annotated SemVer tag and push the tag to trigger CI**
+4. **Create an annotated SemVer tag with public-safe release notes and push the tag to trigger CI**
    ```powershell
-   git tag -a vX.Y.Z -m "AlgoJava vX.Y.Z"
+   git tag -a vX.Y.Z -m "AlgoJava vX.Y.Z release notes..."
    git push origin vX.Y.Z
    ```
+   *(CI derives public GitHub Release notes and manifest `notes` directly from the annotated tag message — never from internal commit history.)*
 
 5. **Monitor `.github/workflows/release.yml`**
-   - Job `verify-and-build` runs on `windows-latest`, verifies all tests + signing key alignment, builds signed `.msi` and `-setup.exe`, validates `latest.json` / `latest-preview.json`, and stages only distributable binaries into a temporary workflow artifact.
-   - Job `publish-release` runs without checking out private source, authenticates with a scoped GitHub App installation token for `cto-mindset/algojava-releases`, uploads only the staged installers, `.sig` files, manifest, and `SHA256SUMS.txt`, and verifies every HTTPS asset URL returns HTTP 200.
+   - Job `verify-and-build` runs on `windows-latest`, verifies all tests, signing key alignment, and Ed25519 signature validity (`--verify-pubkey`), stages only the 6 allowlisted files, and uploads an internal workflow artifact.
+   - Job `publish-release` runs without checking out private source, verifies `SHA256SUMS.txt`, refuses to overwrite any already-published immutable release, creates a **draft** release first, verifies all 6 assets exist, publishes atomically (`--latest` for stable; `--prerelease --latest=false` for preview), and verifies live HTTPS URLs.
 
 6. **Post-release verification**
    - Visit `https://github.com/cto-mindset/algojava-releases/releases/tag/vX.Y.Z`.

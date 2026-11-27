@@ -5,7 +5,7 @@ import {
   validateMsiVersion,
   validateUpdaterManifest,
   validateVersionAlignment,
-} from "../../scripts/release/releaseMetadata";
+} from "./releaseMetadata";
 
 describe("Release metadata & updater manifest generation", () => {
   it("routes stable vs alpha/beta tags to separate manifests without breaking SemVer", () => {
@@ -13,6 +13,9 @@ describe("Release metadata & updater manifest generation", () => {
     expect(stable).toEqual({
       tag: "v1.0.0",
       version: "1.0.0",
+      major: 1,
+      minor: 0,
+      patch: 0,
       channel: "stable",
       isPrerelease: false,
       manifestFileName: "latest.json",
@@ -52,6 +55,26 @@ describe("Release metadata & updater manifest generation", () => {
         packageJsonVersion: "1.0.0",
         tauriConfigVersion: "1.0.0-alpha.1",
         cargoTomlVersion: "1.0.0-alpha.1",
+        msiVersion: "1.0.0.1",
+      }).length
+    ).toBeGreaterThan(0);
+
+    expect(
+      validateVersionAlignment({
+        tag: "v1.1.0-alpha.1",
+        packageJsonVersion: "1.1.0-alpha.1",
+        tauriConfigVersion: "1.1.0-alpha.1",
+        cargoTomlVersion: "1.1.0-alpha.1",
+        msiVersion: "1.0.0.1",
+      }).length
+    ).toBeGreaterThan(0);
+
+    expect(
+      validateVersionAlignment({
+        tag: "v1.0.0",
+        packageJsonVersion: "1.0.0",
+        tauriConfigVersion: "1.0.0",
+        cargoTomlVersion: "1.0.0",
         msiVersion: "1.0.0.1",
       }).length
     ).toBeGreaterThan(0);
@@ -97,6 +120,17 @@ describe("Release metadata & updater manifest generation", () => {
     };
     expect(
       validateUpdaterManifest(tampered, "cto-mindset", "algojava-releases").length
+    ).toBeGreaterThan(0);
+
+    const swapped = {
+      ...manifest,
+      platforms: {
+        ...manifest.platforms,
+        "windows-x86_64-msi": manifest.platforms["windows-x86_64-nsis"],
+      },
+    };
+    expect(
+      validateUpdaterManifest(swapped, "cto-mindset", "algojava-releases").length
     ).toBeGreaterThan(0);
   });
 });

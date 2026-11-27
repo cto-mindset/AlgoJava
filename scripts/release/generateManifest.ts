@@ -14,6 +14,7 @@ import {
   parseReleaseTag,
   validateUpdaterManifest,
 } from "./releaseMetadata";
+import { verifyMinisignArtifactSignature } from "./verifySignature";
 
 function getArg(flag: string, fallback?: string): string | undefined {
   const idx = process.argv.indexOf(flag);
@@ -21,6 +22,10 @@ function getArg(flag: string, fallback?: string): string | undefined {
     return process.argv[idx + 1];
   }
   return fallback;
+}
+
+function hasFlag(flag: string): boolean {
+  return process.argv.includes(flag);
 }
 
 function findArtifactPair(
@@ -32,18 +37,23 @@ function findArtifactPair(
     throw new Error(`Bundle directory does not exist: ${dir}`);
   }
   const files = readdirSync(dir);
-  const matchingInstaller = files.find(
+  const matches = files.filter(
     (name) =>
       name.includes(`_${version}_`) &&
       name.endsWith(suffix) &&
       !name.endsWith(".sig")
   );
-  if (!matchingInstaller) {
+  if (matches.length === 0) {
     throw new Error(
       `Could not find ${suffix} installer for version ${version} in ${dir}`
     );
   }
-  const installerPath = join(dir, matchingInstaller);
+  if (matches.length > 1) {
+    throw new Error(
+      `Ambiguous ${suffix} installers found for version ${version} in ${dir}: ${matches.join(", ")}`
+    );
+  }
+  const installerPath = join(dir, matches[0]);
   const sigPath = `${installerPath}.sig`;
   if (!existsSync(sigPath)) {
     throw new Error(
@@ -112,6 +122,39 @@ function main() {
     copyFileSync(filePath, join(outDir, basename(filePath)));
   }
 
+  let verifyPubkey = getArg("--pubkey");
+  if (!verifyPubkey && hasFlag("--verify-pubkey")) {
+    const tauriConf = JSON.parse(
+      readFileSync(resolve("src-tauri/tauri.conf.json"), "utf8")
+    ) as { plugins?: { updater?: { pubkey?: string } } };
+    verifyPubkey = tauriConf.plugins?.updater?.pubkey?.trim();
+    if (!verifyPubkey) {
+      throw new Error(
+        "--verify-pubkey requested, but plugins.updater.pubkey in src-tauri/tauri.conf.json is empty."
+      );
+    }
+  }
+
+  const msiName = basename(msi.installerPath);
+  const nsisName = basename(nsis.installerPath);
+  const msiSig = readFileSync(join(outDir, basename(msi.sigPath)), "utf8").trim();
+  const nsisSig = readFileSync(join(outDir, basename(nsis.sigPath)), "utf8").trim();
+
+  verifyMinisignArtifactSignature({
+    filePath: join(outDir, msiName),
+    sigBase64: msiSig,
+    expectedFileName: msiName,
+    expectedVersion: parsed.version,
+    pubkeyBase64: verifyPubkey,
+  });
+  verifyMinisignArtifactSignature({
+    filePath: join(outDir, nsisName),
+    sigBase64: nsisSig,
+    expectedFileName: nsisName,
+    expectedVersion: parsed.version,
+    pubkeyBase64: verifyPubkey,
+  });
+
   const manifest = buildUpdaterManifest({
     version: parsed.version,
     notes,
@@ -119,10 +162,10 @@ function main() {
     owner,
     repo,
     tag: parsed.tag,
-    nsisFileName: basename(nsis.installerPath),
-    nsisSignature: readFileSync(nsis.sigPath, "utf8").trim(),
-    msiFileName: basename(msi.installerPath),
-    msiSignature: readFileSync(msi.sigPath, "utf8").trim(),
+    nsisFileName: nsisName,
+    nsisSignature: nsisSig,
+    msiFileName: msiName,
+    msiSignature: msiSig,
   });
 
   const manifestErrors = validateUpdaterManifest(manifest, owner, repo);
