@@ -47,6 +47,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "category": "DeveloperTool",
     "publisher": "Dilshod Fayzullayev (Dylan)",
     "shortDescription": "Offline-first Java coding practice desktop studio",
@@ -55,9 +56,18 @@
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
+      "icons/icon.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico"
+      },
+      "wix": {
+        "version": "1.0.0.1"
+      }
+    }
   },
   "plugins": {
     "sql": {
@@ -65,8 +75,13 @@
     },
     "updater": {
       "pubkey": "",
-      "endpoints": [],
-      "requireSignedVersion": true
+      "endpoints": [
+        "https://github.com/cto-mindset/algojava-releases/releases/latest/download/latest.json"
+      ],
+      "requireSignedVersion": true,
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }

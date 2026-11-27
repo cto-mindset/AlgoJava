@@ -1,31 +1,34 @@
-name: Build & Release (main)
+name: Release (Private Build to Public Releases)
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    tags:
+      - "v*"
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  verify:
-    if: github.ref == 'refs/heads/main'
+  verify-and-build:
+    name: Verify Quality Gates & Build Signed Windows Installers
     runs-on: windows-latest
+    permissions:
+      contents: read
     outputs:
-      version: ${{ steps.release_meta.outputs.version }}
-      tag: ${{ steps.release_meta.outputs.tag }}
-      is_prerelease: ${{ steps.release_meta.outputs.is_prerelease }}
-      release_id: ${{ steps.release_meta.outputs.release_id }}
+      tag: ${{ steps.meta.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      channel: ${{ steps.meta.outputs.channel }}
+      is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
+      manifest_file: ${{ steps.meta.outputs.manifest_file }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout private source repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -33,97 +36,221 @@ jobs:
       - name: Setup Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
+      - name: Rust build cache
+        uses: Swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
 
-      - name: Install dependencies
+      - name: Verify Windows installer toolchains (WiX & NSIS)
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue)) {
+            if (Get-Command choco -ErrorAction SilentlyContinue) {
+              choco install nsis -y
+            } else {
+              throw "NSIS (makensis) is not available on runner."
+            }
+          }
+          makensis /VERSION
+
+      - name: Install project dependencies
         run: bun install --frozen-lockfile
 
-      - name: Run frontend quality gates
-        run: |
-          bun run typecheck
-          bun run test
-          bun run build
-
-      - name: Run Rust unit tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml
-
-      - name: Prepare GitHub Release for current version
-        id: release_meta
+      - name: Parse release tag & run signing preflight
+        id: meta
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          VERSION=$(bun -e "console.log(JSON.parse(require('fs').readFileSync('src-tauri/tauri.conf.json','utf8')).version)")
-          TAG="v${VERSION}"
-          if [[ "$VERSION" == *"-"* ]]; then
-            IS_PRERELEASE="true"
-          else
-            IS_PRERELEASE="false"
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if [[ -z "${TAURI_SIGNING_PRIVATE_KEY}" ]]; then
+            echo "::error::Missing TAURI_SIGNING_PRIVATE_KEY repository secret. Configure signing secrets before tagging a release."
+            exit 1
           fi
 
-          if ! RELEASE_ID=$(gh release view "$TAG" --json databaseId -q .databaseId 2>/dev/null); then
-            PRERELEASE_FLAG=""
-            if [[ "$IS_PRERELEASE" == "true" ]]; then
-              PRERELEASE_FLAG="--prerelease"
+          PREFLIGHT_OUT=$(bun run scripts/release/preflightCheck.ts --tag "${TAG}" --require-signing-key)
+          echo "${PREFLIGHT_OUT}"
+
+          VERSION=$(bun -e "import { parseReleaseTag } from './scripts/release/releaseMetadata.ts'; console.log(parseReleaseTag('${TAG}').version)")
+          CHANNEL=$(bun -e "import { parseReleaseTag } from './scripts/release/releaseMetadata.ts'; console.log(parseReleaseTag('${TAG}').channel)")
+          IS_PRE=$(bun -e "import { parseReleaseTag } from './scripts/release/releaseMetadata.ts'; console.log(String(parseReleaseTag('${TAG}').isPrerelease))")
+          MANIFEST=$(bun -e "import { parseReleaseTag } from './scripts/release/releaseMetadata.ts'; console.log(parseReleaseTag('${TAG}').manifestFileName)")
+
+          {
+            echo "tag=${TAG}"
+            echo "version=${VERSION}"
+            echo "channel=${CHANNEL}"
+            echo "is_prerelease=${IS_PRE}"
+            echo "manifest_file=${MANIFEST}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run TypeScript typecheck
+        run: bun run typecheck
+
+      - name: Run Vitest unit & UI tests
+        run: bun run test
+
+      - name: Run Cargo tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Run production frontend build
+        run: bun run build
+
+      - name: Build signed Windows MSI and NSIS installers
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: bun run tauri build
+
+      - name: Generate release notes & validated updater manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+
+          {
+            echo "## AlgoJava ${TAG}"
+            echo ""
+            echo "Channel: \`${{ steps.meta.outputs.channel }}\`"
+            echo ""
+            if [[ -n "${PREV_TAG}" ]]; then
+              echo "### Changes since ${PREV_TAG}"
+              git log "${PREV_TAG}..${TAG}" --pretty=format:"- %s" --no-merges || true
+            else
+              echo "### Highlights"
+              echo "- Initial signed Windows desktop release (${TAG})."
             fi
-            gh release create "$TAG" \
-              --target "${{ github.sha }}" \
-              --title "AlgoJava ${TAG}" \
-              --notes "Automated build from main branch for AlgoJava ${TAG}." \
-              $PRERELEASE_FLAG
-            RELEASE_ID=$(gh release view "$TAG" --json databaseId -q .databaseId)
-          fi
+            echo ""
+            echo "### Verification"
+            echo "- Installers and updater packages are signed with Tauri Ed25519 keys."
+            echo "- Verify checksums with \`SHA256SUMS.txt\`."
+          } > release-notes.md
 
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "is_prerelease=${IS_PRERELEASE}" >> "$GITHUB_OUTPUT"
-          echo "release_id=${RELEASE_ID}" >> "$GITHUB_OUTPUT"
+          bun run scripts/release/generateManifest.ts \
+            --tag "${TAG}" \
+            --owner "cto-mindset" \
+            --repo "algojava-releases" \
+            --bundle-dir "src-tauri/target/release/bundle" \
+            --notes-file "release-notes.md" \
+            --out-dir "release-assets"
 
-  build-release:
-    needs: verify
-    if: github.ref == 'refs/heads/main'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-          - os: macos-latest
-          - os: ubuntu-22.04
+      - name: Stage distributable release artifacts & notes internally
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ steps.meta.outputs.tag }}
+          path: |
+            release-assets/
+            release-notes.md
+          retention-days: 1
+          if-no-files-found: error
 
-    runs-on: ${{ matrix.os }}
+  publish-release:
+    name: Publish Distributables to Public Release Repository
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    permissions: {}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Linux Tauri system dependencies
-        if: matrix.os == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Setup Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build and upload Tauri bundles
-        uses: tauri-apps/tauri-action@v0
+      - name: Validate GitHub App secrets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_ID: ${{ secrets.GH_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${APP_ID}" || -z "${APP_PRIVATE_KEY}" ]]; then
+            echo "::error::Missing GH_APP_ID or GH_APP_PRIVATE_KEY secrets required for publishing to cto-mindset/algojava-releases."
+            exit 1
+          fi
+
+      - name: Generate scoped GitHub App token for cto-mindset/algojava-releases
+        id: app_token
+        uses: actions/create-github-app-token@v1
         with:
-          releaseId: ${{ needs.verify.outputs.release_id }}
-          tauriScript: bun run tauri
-          prerelease: ${{ needs.verify.outputs.is_prerelease == 'true' }}
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: cto-mindset
+          repositories: algojava-releases
+
+      - name: Download staged release artifacts (zero private source)
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-${{ needs.verify-and-build.outputs.tag }}
+          path: staged
+
+      - name: Verify staged artifact allowlist (no source files)
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          echo "Staged release files:"
+          ls -la staged/release-assets/
+          for f in staged/release-assets/*; do
+            base="$(basename "$f")"
+            case "$base" in
+              *.msi|*.msi.sig|*-setup.exe|*-setup.exe.sig|latest.json|latest-preview.json|SHA256SUMS.txt)
+                ;;
+              *)
+                echo "::error::Unexpected non-distributable file blocked from public release: ${base}"
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Publish release & assets to cto-mindset/algojava-releases
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          set -euo pipefail
+          PUBLIC_REPO="cto-mindset/algojava-releases"
+          TAG="${{ needs.verify-and-build.outputs.tag }}"
+          IS_PRE="${{ needs.verify-and-build.outputs.is_prerelease }}"
+
+          if gh release view "${TAG}" --repo "${PUBLIC_REPO}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" staged/release-assets/* --repo "${PUBLIC_REPO}" --clobber
+            if [[ "${IS_PRE}" == "true" ]]; then
+              gh release edit "${TAG}" --repo "${PUBLIC_REPO}" --title "AlgoJava ${TAG}" --notes-file staged/release-notes.md --prerelease --latest=false
+            else
+              gh release edit "${TAG}" --repo "${PUBLIC_REPO}" --title "AlgoJava ${TAG}" --notes-file staged/release-notes.md --latest
+            fi
+          else
+            if [[ "${IS_PRE}" == "true" ]]; then
+              gh release create "${TAG}" staged/release-assets/* \
+                --repo "${PUBLIC_REPO}" \
+                --title "AlgoJava ${TAG}" \
+                --notes-file staged/release-notes.md \
+                --prerelease \
+                --latest=false
+            else
+              gh release create "${TAG}" staged/release-assets/* \
+                --repo "${PUBLIC_REPO}" \
+                --title "AlgoJava ${TAG}" \
+                --notes-file staged/release-notes.md \
+                --latest
+            fi
+          fi
+
+      - name: Verify published manifest & installer download URLs
+        run: |
+          set -euo pipefail
+          PUBLIC_REPO="cto-mindset/algojava-releases"
+          TAG="${{ needs.verify-and-build.outputs.tag }}"
+          MANIFEST="${{ needs.verify-and-build.outputs.manifest_file }}"
+          IS_PRE="${{ needs.verify-and-build.outputs.is_prerelease }}"
+          MANIFEST_URL="https://github.com/${PUBLIC_REPO}/releases/download/${TAG}/${MANIFEST}"
+
+          echo "Checking manifest at ${MANIFEST_URL}"
+          curl -fsSL "${MANIFEST_URL}" -o verified-manifest.json
+          jq -e '.version and .pub_date and .platforms["windows-x86_64-nsis"].url and .platforms["windows-x86_64-nsis"].signature and .platforms["windows-x86_64-msi"].url and .platforms["windows-x86_64-msi"].signature' verified-manifest.json
+
+          if [[ "${IS_PRE}" == "false" ]]; then
+            LATEST_URL="https://github.com/${PUBLIC_REPO}/releases/latest/download/latest.json"
+            echo "Checking stable latest endpoint at ${LATEST_URL}"
+            curl -fsSL "${LATEST_URL}" -o verified-latest.json
+            jq -e --arg v "${{ needs.verify-and-build.outputs.version }}" '.version == $v' verified-latest.json
+          fi
+
+          for url in $(jq -r '.platforms[] | .url' verified-manifest.json | sort -u); do
+            echo "Verifying download URL: ${url}"
+            curl -fsSIL "${url}" >/dev/null
+          done

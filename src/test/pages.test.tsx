@@ -50,6 +50,19 @@ vi.mock("@/lib/tauri/storageClient", () => ({
 }));
 
 vi.mock("@/lib/tauri/updaterClient", () => ({
+  checkForAppUpdate: vi.fn().mockResolvedValue({
+    status: "not_configured",
+    errorKind: "not_configured",
+    message: "Offline build",
+  }),
+  downloadAndInstallPendingUpdate: vi.fn(),
+  clearPendingUpdate: vi.fn(),
+  restartApplication: vi.fn(),
+  isUpdaterConfigured: vi.fn().mockResolvedValue(false),
+  sanitizeUpdaterError: vi.fn().mockReturnValue({
+    kind: "unknown",
+    message: "Update error",
+  }),
   checkForUpdatesSafely: vi.fn().mockResolvedValue({
     status: "not_configured",
     message: "Offline build",

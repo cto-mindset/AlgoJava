@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/algojava-icon.png" />
     <title>AlgoJava</title>
     <style>
       :root {
@@ -209,10 +212,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff;
-        background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
-          0 14px 30px -6px rgba(124, 58, 237, 0.58);
+        overflow: hidden;
+        background: transparent;
+        box-shadow: 0 14px 30px -6px rgba(124, 58, 237, 0.52);
+      }
+
+      .splash-logo img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
       }
 
       .splash-title-group {
@@ -463,21 +472,7 @@
           <div class="splash-logo-wrap">
             <div class="splash-logo-ring" aria-hidden="true"></div>
             <div class="splash-logo">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M7 8l-4 4l4 4" />
-                <path d="M17 8l4 4l-4 4" />
-                <path d="M14 4l-4 16" />
-              </svg>
+              <img src="/algojava-icon.png" alt="AlgoJava" width="64" height="64" />
             </div>
           </div>
 

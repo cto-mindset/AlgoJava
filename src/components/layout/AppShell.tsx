@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { TitleBar } from "./TitleBar";
 import { ToastViewport } from "@/components/ui/Toast";
+import { UpdateNotificationDialog } from "@/components/shared/UpdateNotificationDialog";
 
 export function AppShell() {
   return (
@@ -13,6 +14,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <UpdateNotificationDialog />
       <ToastViewport />
     </div>
   );

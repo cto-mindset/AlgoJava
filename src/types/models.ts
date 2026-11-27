@@ -44,6 +44,9 @@ export interface AppSettings {
   rememberLastCategory: boolean;
   showSolvedProblems: boolean;
   lastCategoryId: string | null;
+
+  lastUpdateCheckAt: string | null;
+  dismissedUpdateVersion: string | null;
 }
 
 export interface CategorySummary {

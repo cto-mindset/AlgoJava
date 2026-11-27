@@ -57,6 +57,8 @@ pub fn run() {
             commands::system::show_splash_screen,
             commands::system::update_splash_status,
             commands::system::finish_splash_screen,
+            commands::system::is_updater_configured,
+            commands::system::restart_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

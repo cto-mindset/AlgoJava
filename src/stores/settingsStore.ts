@@ -36,6 +36,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   rememberLastCategory: true,
   showSolvedProblems: true,
   lastCategoryId: null,
+
+  lastUpdateCheckAt: null,
+  dismissedUpdateVersion: null,
 };
 
 let storeInstancePromise: Promise<Store> | null = null;

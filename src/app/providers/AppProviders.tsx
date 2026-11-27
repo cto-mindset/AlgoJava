@@ -8,8 +8,10 @@ import {
 } from "@/lib/tauri/windowClient";
 import { useJavaRuntimeStore } from "@/stores/javaRuntimeStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useUpdaterStore } from "@/stores/updaterStore";
 
 const MIN_SPLASH_MS = 950;
+const STARTUP_UPDATE_DELAY_MS = 6000;
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const hydrateSettings = useSettingsStore((s) => s.hydrateSettings);
@@ -78,6 +80,14 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     prevJdkPathRef.current = customJdkPath;
     void detectRuntime(customJdkPath);
   }, [hydrated, customJdkPath, detectRuntime]);
+
+  useEffect(() => {
+    if (!hydrated || !isTauriRuntime()) return;
+    const timer = window.setTimeout(() => {
+      void useUpdaterStore.getState().runStartupCheck();
+    }, STARTUP_UPDATE_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [hydrated]);
 
   return <ThemeProvider>{children}</ThemeProvider>;
 }
