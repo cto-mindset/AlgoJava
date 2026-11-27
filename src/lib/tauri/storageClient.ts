@@ -42,7 +42,7 @@ export async function importProgressFile(path: string): Promise<string> {
 export async function getAppBuildInfo(): Promise<AppBuildInfo> {
   if (!isTauriRuntime()) {
     return {
-      appVersion: "1.0.0",
+      appVersion: "1.0.1",
       buildDate: "2026.11.27",
       tauriVersion: "2.x",
       rustEdition: "2024",

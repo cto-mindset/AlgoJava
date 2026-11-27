@@ -132,7 +132,7 @@ export function AboutSummaryCard() {
           <div>
             <div className="text-[var(--text-muted)]">Version</div>
             <div className="algo-tabular mt-0.5 font-semibold text-[var(--text-primary)]">
-              {buildInfo?.appVersion ?? "1.0.0"}
+              {buildInfo?.appVersion ?? "1.0.1"}
             </div>
           </div>
           <div>
@@ -171,7 +171,7 @@ export function AboutSummaryCard() {
         {updaterStatus === "up_to_date" && (
           <p className="text-xs text-[var(--text-secondary)]">
             You are running the latest available version of AlgoJava (v
-            {buildInfo?.appVersion ?? "1.0.0"}).
+            {buildInfo?.appVersion ?? "1.0.1"}).
           </p>
         )}
 

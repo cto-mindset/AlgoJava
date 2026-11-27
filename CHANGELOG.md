@@ -2,6 +2,12 @@
 
 All notable changes to **AlgoJava** are documented in this file.
 
+## [1.0.1] - 2026-11-27
+
+### Improvements
+- **Markdown Release Notes Viewer**: Added a pure React `MarkdownContent` viewer that formats headings, bullet/ordered lists, inline code, fenced code blocks, blockquotes, horizontal rules, and safe HTTPS links inside both the update notification dialog and **Settings → About AlgoJava**.
+- **Security**: Neutralizes unsafe link schemes and raw HTML tags when rendering update release notes.
+
 ## [1.0.0] - 2026-11-27
 
 First stable release of **AlgoJava** — a 100% free, offline-first Java algorithm practice desktop studio built with Tauri 2, React, TypeScript, CodeMirror 6, SQLite, and a native Rust backend.
