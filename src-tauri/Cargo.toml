@@ -1,6 +1,6 @@
 [package]
 name = "algojava"
-version = "1.0.0-alpha.1"
+version = "1.0.0"
 description = "Offline-first Java coding practice desktop application"
 authors = ["Dilshod Fayzullayev (Dylan)"]
 edition = "2024"

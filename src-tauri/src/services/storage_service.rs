@@ -145,7 +145,7 @@ pub fn get_app_build_info(app: &AppHandle) -> AppBuildInfo {
     AppBuildInfo {
         app_version: pkg.version.to_string(),
         build_date: option_env!("ALGOJAVA_BUILD_DATE")
-            .unwrap_or("2026.11.25")
+            .unwrap_or("2026.11.27")
             .to_string(),
         tauri_version: tauri::VERSION.to_string(),
         rust_edition: "2024".to_string(),

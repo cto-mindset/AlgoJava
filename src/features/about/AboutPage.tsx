@@ -115,10 +115,10 @@ export function AboutPage() {
             <JavaCupEmblem className="w-12 h-12 shrink-0" />
             <div className="space-y-1 text-xs">
               <div className="algo-tabular text-sm font-bold text-[var(--text-primary)]">
-                AlgoJava v{buildInfo?.appVersion ?? "1.0.0-alpha.1"}
+                AlgoJava v{buildInfo?.appVersion ?? "1.0.0"}
               </div>
               <div className="algo-tabular text-[var(--text-muted)]">
-                Build {buildInfo?.buildDate ?? "2026.11.25"} · Rust Native Core
+                Build {buildInfo?.buildDate ?? "2026.11.27"} · Rust Native Core
               </div>
               <div className="pt-0.5">
                 {jdkInfo?.detected ? (

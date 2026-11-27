@@ -39,8 +39,8 @@ vi.mock("@/lib/tauri/storageClient", () => ({
   exportProgressFile: vi.fn(),
   importProgressFile: vi.fn(),
   getAppBuildInfo: vi.fn().mockResolvedValue({
-    appVersion: "1.0.0-alpha.1",
-    buildDate: "2026.11.25",
+    appVersion: "1.0.0",
+    buildDate: "2026.11.27",
     tauriVersion: "2.12.7",
     rustEdition: "2024",
     targetOs: "windows",
