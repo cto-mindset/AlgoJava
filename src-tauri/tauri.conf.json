@@ -74,7 +74,7 @@
       "preload": ["sqlite:algojava.db"]
     },
     "updater": {
-      "pubkey": "",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMxNDgyMDFCMjdGNkRBNjEKUldSaDJ2WW5HeUJJTVo0ZjZOSEpFSkxWS3BlZTFmUkU3YTUwU3FHT0tpc0ZZMnZIRkZBTGtpalgK",
       "endpoints": [
         "https://github.com/cto-mindset/algojava-releases/releases/latest/download/latest.json"
       ],
