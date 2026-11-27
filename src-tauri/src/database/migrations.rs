@@ -31,6 +31,12 @@ mod tests {
             assert!(m.version > prev_version);
             assert!(!m.description.trim().is_empty());
             assert!(!m.sql.trim().is_empty());
+            assert!(
+                !m.sql.contains('\r'),
+                "Migration {} ({}) must use LF line endings to keep sqlx checksums identical across OSes",
+                m.version,
+                m.description
+            );
             assert!(matches!(m.kind, MigrationKind::Up));
             prev_version = m.version;
         }

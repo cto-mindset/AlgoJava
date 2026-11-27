@@ -8,6 +8,9 @@ import "@fontsource-variable/geist-mono";
 import "@fontsource-variable/google-sans-code";
 import "./styles/globals.css";
 import { App } from "./app/App";
+import { installProductionWebviewHardening } from "./lib/tauri/productionHardening";
+
+installProductionWebviewHardening();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

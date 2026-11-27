@@ -2,6 +2,9 @@ import "@fontsource-variable/outfit";
 import "@fontsource-variable/jetbrains-mono";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { installProductionWebviewHardening } from "../lib/tauri/productionHardening";
+
+installProductionWebviewHardening();
 
 interface SplashProgressPayload {
   message: string;
