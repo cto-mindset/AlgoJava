@@ -7,6 +7,7 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 import { Badge, Button, Dialog, ProgressBar } from "@/components/ui";
+import { MarkdownContent } from "@/components/shared/MarkdownContent";
 import { useUpdaterStore } from "@/stores/updaterStore";
 
 function formatTransferSize(bytes: number): string {
@@ -227,8 +228,8 @@ export function UpdateNotificationDialog() {
             <div className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
               Release Notes
             </div>
-            <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-3 text-xs leading-relaxed text-[var(--text-secondary)]">
-              {availableUpdate.notes}
+            <div className="max-h-56 overflow-y-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface-secondary)] p-3.5">
+              <MarkdownContent content={availableUpdate.notes} />
             </div>
           </div>
         )}

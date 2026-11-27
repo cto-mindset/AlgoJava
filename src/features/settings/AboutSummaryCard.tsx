@@ -12,6 +12,7 @@ import {
   IconWifiOff,
 } from "@tabler/icons-react";
 import { Badge, Button, Dialog, ProgressBar, SettingCard } from "@/components/ui";
+import { MarkdownContent } from "@/components/shared/MarkdownContent";
 import { getAppBuildInfo } from "@/lib/tauri/storageClient";
 import { useJavaRuntimeStore } from "@/stores/javaRuntimeStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -226,8 +227,8 @@ export function AboutSummaryCard() {
               )}
             </div>
 
-            <div className="max-h-28 overflow-y-auto whitespace-pre-wrap rounded-[var(--radius-xs)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2.5 py-2 text-xs text-[var(--text-secondary)]">
-              {availableUpdate.notes}
+            <div className="max-h-40 overflow-y-auto rounded-[var(--radius-xs)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2.5">
+              <MarkdownContent content={availableUpdate.notes} compact />
             </div>
 
             {(updaterStatus === "downloading" ||
