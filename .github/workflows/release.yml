@@ -44,13 +44,25 @@ jobs:
       - name: Verify Windows installer toolchains (WiX & NSIS)
         shell: pwsh
         run: |
+          $nsisDir = "C:\Program Files (x86)\NSIS"
           if (-not (Get-Command makensis -ErrorAction SilentlyContinue)) {
-            if (Get-Command choco -ErrorAction SilentlyContinue) {
-              choco install nsis -y
-            } else {
-              throw "NSIS (makensis) is not available on runner."
+            if (-not (Test-Path (Join-Path $nsisDir "makensis.exe"))) {
+              if (Get-Command choco -ErrorAction SilentlyContinue) {
+                choco install nsis -y
+                if ($LASTEXITCODE -ne 0) { throw "choco install nsis failed with exit code $LASTEXITCODE" }
+              } else {
+                throw "NSIS (makensis) is not available on runner."
+              }
             }
           }
+          if (Test-Path (Join-Path $nsisDir "makensis.exe")) {
+            if ($env:PATH -notlike "*$nsisDir*") {
+              $env:PATH = "$nsisDir;$env:PATH"
+            }
+            $nsisDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+          $makensisCmd = Get-Command makensis -ErrorAction Stop
+          Write-Host "Using makensis: $($makensisCmd.Source)"
           makensis /VERSION
 
       - name: Install project dependencies
