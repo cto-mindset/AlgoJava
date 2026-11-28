@@ -103,7 +103,7 @@ const CODE_FENCE_RE = /^```([\w-]*)\s*$/;
 const QUOTE_RE = /^\s*>\s?(.*)$/;
 
 function parseBlocks(markdown: string): BlockNode[] {
-  const lines = markdown.replace(/\r\n?/g, "\n").split("\n");
+  const lines = markdown.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").split("\n");
   const blocks: BlockNode[] = [];
   let i = 0;
 
